@@ -1,0 +1,345 @@
+---
+title: "Untitled"
+author: "Thomas J. Sauters"
+date: '2022-07-12'
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(magrittr)
+library(stringr)
+library(ggplot2)
+library(ggpubr)
+library(dplyr)
+library(forcats)
+library(cowplot)
+library(broom)
+library(ggbeeswarm)
+library(data.table)
+library(GGally)
+
+
+p <- theme(text = element_text(size = 20), plot.title = element_text(size = 30, face = "bold")) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.line = element_line(colour = "black"), plot.title = element_text(hjust = 0.5))
+
+#plates <- read.csv("C:\\Users\\tsauters\\Documents\\Bt_45_amoeba_5_30_2022.csv")
+```
+
+```{r}
+Days <- c(1:180)
+
+Day <- as.data.frame(Days)
+
+Day
+```
+
+```{r}
+mouse <- read.csv("../Data/Exported_Survival_Data_Day173.csv")
+
+mouse
+```
+
+```{r}
+mouse.df <- as.data.frame(t(left_join(Day, mouse, by = 'Days')))
+
+head(mouse.df)
+```
+
+```{r}
+#write.csv(mouse.df, "C:/Users/tsauters/Documents/Exported_Survival_Data.csv")
+```
+
+```{r}
+long <- read.csv("../Data/Exported_Survival_Data.csv")
+
+head(long)
+```
+
+```{r}
+curve <- long %>%
+  filter(Strain != 'Progeny48') %>%
+  gather(time, Survival, 
+         -Strain) %>%
+  mutate(time = str_extract(.$time, "[0-9]+") %>% as.numeric()) #%>%
+#  mutate(time = time/3600)
+
+head(curve)
+```
+
+```{r}
+curve %>%
+  ggplot(aes(time, Survival, group = interaction(Strain))) +
+  geom_line(aes(color= Strain), alpha=0.5, size = 1) +
+  p +
+  xlab("Days Post Infection")
+```
+
+```{r}
+test <- curve %>%
+  filter(Strain == "H99")
+
+div <- max(test$Survival)
+
+test %>%
+  mutate(Percent = (Survival/div)*100)
+```
+
+```{r}
+strains <- unique(curve$Strain)
+
+data <- list()
+i=1
+
+for (g in strains) {
+  if (g == "H99") {
+    strn <- curve %>%
+    filter(Strain == g)
+
+    div <- 5#max(strn$Survival)
+
+    mut <- strn %>%
+    mutate(Percent = (abs(100 - (Survival/div)*100)))
+  
+    data[[i]] <- mut
+  
+    i = i+1
+  } else {
+  
+    strn <- curve %>%
+      filter(Strain == g)
+
+    div <- 10  #max(strn$Survival)
+
+    mut <- strn %>%
+      mutate(Percent = (abs(100 - (Survival/div)*100)))
+  
+    data[[i]] <- mut
+  
+    i = i+1 
+  }
+#  print(mut)
+}
+
+perc <- do.call(rbind, data)
+
+perc
+```
+
+```{r}
+write.csv(perc, "C:/Users/tsauters/Documents/Exported_Progeny_Survival_Data.csv")
+```
+
+```{r}
+changes <- perc[!duplicated(perc[,c('Strain', 'Survival', 'Percent')]),]
+
+changes
+```
+```{r}
+#write.csv(changes, "C:/Users/tsauters/Documents/Exported_Progeny_Survival_Data_changes.csv")
+
+changes <- read.csv("../Data/Exported_Progeny_Survival_Data_changes.csv")
+```
+
+```{r}
+Grouping <- changes %>%
+  select(Strain, Group)
+
+perc <- merge(perc, Grouping, by = "Strain")
+```
+
+
+```{r}
+rents <- changes %>%
+  filter(Strain %in% c('Progeny48','Bt22', 'Ftc555-1', 'H99'))
+
+perc %>%
+  filter(Strain %in% c('Progeny48', 'Bt22', 'Ftc555-1', 'H99')) %>%
+  ggplot(aes(time, Percent, group = interaction(Strain))) +
+  geom_line(aes(color= Strain),
+            alpha = 0.75, size = 1.5) +
+  geom_point(data = rents, aes(time, Percent, shape = Strain, color = Strain),
+             size = 4) +
+  p +
+  xlab("Days Post Infection") +
+  ylab("Percent Survival") +
+  scale_color_manual(values = c('Progeny48' = "white", 'Bt22' = "dodgerblue3", 'Ftc555-1' = "chocolate1", 'H99' = "Black"),
+                      guide = "none") +
+  scale_shape_manual(values = c('Progeny48' = 17, 'Bt22' = 16, 'Ftc555-1' = 17, 'H99' = 15)) +
+  theme(text = element_text(size = 40), plot.title = element_text(size = 60, face = "bold"))
+
+ggsave("Progeny Mouse Curve rents.png", path = "../Figures/",
+       height = 7, width = 12)
+```
+
+```{r}
+bt <- changes %>%
+  filter(Strain %in% 
+           c('Bt22', 'Ftc555-1', 'H99', 'Progeny42', 'Progeny11'))
+
+perc %>%
+  filter(Strain %in% c('Bt22', 'Ftc555-1', 'H99', 'Progeny11', 'Progeny42')) %>%
+  ggplot(aes(time, Percent, group = interaction(Strain))) +
+  geom_line(aes(color= Strain),
+            alpha = 0.75, size = 1.5) +
+  geom_point(data = bt, aes(time, Percent, shape = Strain, color = Strain),
+             size = 4) +
+  p +
+  xlab("Days Post Infection") +
+  ylab("Percent Survival") +
+  scale_color_manual(values = c("dodgerblue3", "chocolate1", "Black", "dodgerblue4", "dodgerblue4"),
+                      guide = "none") +
+  scale_shape_manual(values = c('Bt22' = 16, 'Ftc555-1' = 17, 'H99' = 15, 'Progeny11' = 16, 'Progeny42' = 16)) +
+  theme(text = element_text(size = 40), plot.title = element_text(size = 60, face = "bold"))
+
+ggsave("Progeny Mouse Curve bt.png", path = "../Figures/",
+       height = 7, width = 12)
+```
+
+```{r}
+ftc <- changes %>%
+  filter(Strain %in% 
+           c('Bt22', 'Ftc555-1', 'H99', 'Progeny24', 'Progeny40', 'Progeny31', 'Progeny48'))
+
+perc %>%
+  filter(Strain %in% 
+           c('Bt22', 'Ftc555-1', 'H99', 'Progeny24', 'Progeny40', 'Progeny31', 'Progeny48')) %>%
+  ggplot(aes(time, Percent, group = interaction(Strain))) +
+  geom_line(aes(color= Strain),
+            alpha = 0.75, size = 1.5) +
+  geom_point(data = ftc, aes(time, Percent, shape = Strain, color = Strain),
+             size = 4) +
+  p +
+  xlab("Days Post Infection") +
+  ylab("Percent Survival") +
+  scale_color_manual(values = c("dodgerblue3", "chocolate1", "Black", "chocolate3", "chocolate3", "chocolate3", "chocolate3"),
+                      guide = "none") +
+  scale_shape_manual(values = c('Bt22' = 16, 'Ftc555-1' = 17, 'H99' = 15, 'Progeny24' = 17, 'Progeny40' = 17, 'Progeny31' = 17, 'Progeny48' = 17)) +
+  theme(text = element_text(size = 40), plot.title = element_text(size = 60, face = "bold"))
+
+ggsave("Progeny Mouse Curve ftc.png", path = "../Figures/",
+       height = 7, width = 12)
+```
+
+```{r}
+perc %>%
+  ggplot(aes(time, Percent, group = interaction(Strain))) +
+  geom_line(aes(color= Strain),
+            alpha = 0.75, size = 1.5) +
+  geom_point(data = changes, aes(time, Percent, shape = Strain, color = Strain),
+             size = 4) +
+  p +
+  xlab("Days Post Infection") +
+  ylab("Percent Survival") +
+  scale_color_manual(values = c('Bt22' = "dodgerblue3", 'Ftc555-1' = "chocolate1", 'H99' = "Black", 'Progeny24' = "chocolate3", 'Progeny40' = "chocolate3", 'Progeny31' = "chocolate3", 'Progeny48' = "chocolate3", 'Progeny11' = "dodgerblue4", 'Progeny42' = "dodgerblue4"),
+                      guide = "none") +
+  scale_shape_manual(values = c('Bt22' = 16, 'Ftc555-1' = 17, 'H99' = 15, 'Progeny24' = 17, 'Progeny40' = 17, 'Progeny31' = 17, 'Progeny48' = 17, 'Progeny11' = 16, 'Progeny42' = 16)) +
+  theme(text = element_text(size = 40), plot.title = element_text(size = 60, face = "bold"))
+
+ggsave("Progeny Mouse Curve.png", path = "../Figures/",
+       height = 7, width = 12)
+```
+
+```{r}
+perc %>%
+  mutate(Grp = substr(Strain, 1, 1)) %>%
+  select(Grp) %>%
+  unique()
+
+#head(perc)
+```
+
+
+
+
+```{r}
+leg <- c('PBS','Bt22', 'Ftc555-1', 'H99', 'Bt22 allele', 'Ftc555-1 allele')
+```
+
+```{r}
+perc %>%
+  ggplot(aes(time, Percent, group = interaction(Strain))) +
+  geom_line(aes(color= Group),
+            alpha = 0.75, size = 1.5) +
+  geom_point(data = changes, aes(time, Percent, shape = Group, color = Group),
+             size = 5) +
+  xlab("Days Post Infection") +
+  ylab("Percent Survival") +
+  scale_color_manual(values = c('B' = "grey",
+                                'C' = "dodgerblue3", 
+                                'D' = "chocolate1", 
+                                'A' = "Black", 
+                                'E' = "dodgerblue4", 
+                                'F' = "chocolate3"),
+                     labels = leg,
+                     name = "Strain") +
+  scale_shape_manual(values = c('B' = 13,
+                                'C' = 16,
+                                'D' = 17,
+                                'A' = 15,
+                                'E' = 19,
+                                'F' = 18),
+                     labels = leg,
+                     name = "Strain") +
+  theme(text = element_text(size = 30), 
+        plot.title = element_text(size = 40, face = "bold"),
+        panel.background = element_blank(),
+        panel.border = element_rect(color = "black",
+                                    fill = NA,
+                                    size = 1),
+        legend.position = "top",
+        legend.title = element_blank())
+
+ggsave("Progeny_Mouse_Curve.png", path = "../Figures/",
+       height = 7, width = 10)
+```
+```{r}
+leg.lim <- c('Bt22', 'Ftc555-1', 'H99')
+
+lim.changes <- changes %>%
+  filter(Strain %in% c("Bt22", "Ftc555-1", "H99"))
+
+perc %>%
+  filter(Strain %in% c("Bt22", "Ftc555-1", "H99")) %>%
+  ggplot(aes(time, Percent, group = interaction(Strain))) +
+  geom_line(aes(color= Group),
+            alpha = 0.75, size = 1.5) +
+  geom_point(data = lim.changes, aes(time, Percent, shape = Group, color = Group),
+             size = 5) +
+  xlab("Days Post Infection") +
+  ylab("Percent Survival") +
+  scale_color_manual(values = c(
+                                'C' = "dodgerblue3", 
+                                'D' = "chocolate1", 
+                                'A' = "Black"),
+                     labels = leg.lim,
+                     name = "Strain") +
+  scale_shape_manual(values = c(
+                                'C' = 16,
+                                'D' = 17,
+                                'A' = 15),
+                     labels = leg.lim,
+                     name = "Strain") +
+  theme(text = element_text(size = 30), 
+        plot.title = element_text(size = 40, face = "bold"),
+        panel.background = element_blank(),
+        panel.border = element_rect(color = "black",
+                                    fill = NA,
+                                    size = 1),
+        legend.position = "top",
+        legend.title = element_blank())
+
+ggsave("Progeny_Mouse_Curve_lim.png", path = "../Figures/",
+       height = 7, width = 10)
+```
+
+```{r}
+long_data <- long[,-1]
+
+long_sums <- rowSums(long_data, na.rm = TRUE)
+
+long_growth <- long_sums*1
+
+head(long_growth)
+```
+

@@ -1,0 +1,353 @@
+---
+title: "Xl280x431_amoeba_full"
+author: "Thomas J. Sauters"
+date: "10/22/2020"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(magrittr)
+library(stringr)
+library(ggplot2)
+library(ggpubr)
+library(dplyr)
+library(forcats)
+library(cowplot)
+library(broom)
+library(ggbeeswarm)
+library(GGally)
+
+
+p <- theme(text = element_text(size = 20), plot.title = element_text(size = 30, face = "bold")) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.line = element_line(colour = "black"), plot.title = element_text(hjust = 0.5))
+
+plate <- read.csv("C:\\Users\\tsauters\\Documents\\XL280x431_cross_amoeba_full_01_2021.csv")
+```
+
+```{r}
+plates <- select(plate, -Mean, -Min, -Max)
+
+head(plates)
+```
+```{r}
+plates %>%
+  filter(Strain =='B378')
+```
+
+
+```{r}
+fil.plates <- plates %>%
+  filter(issues != "")
+
+fil.plates
+```
+
+```{r}
+wide.boi <- plates %>%
+  filter(issues == "") %>%
+  select(-issues) %>%
+  arrange(Strain, Day) %>%
+  unite("Strain", c("Strain", "Replicate", "Stack", "passage", "plate"), sep = "&") %>%
+  reshape(idvar = "Strain", timevar = "Day", direction = "wide") %>%
+  separate("Strain", c("Strain", "Replicate", "Stack", "passage", "plate"), sep = "&")
+
+wide.boi <- na.omit(wide.boi)
+
+remove <- function(x, na.rm = TRUE) (
+  x - wide.boi$`Area.1`
+)
+
+removed.boi <- wide.boi %>% mutate_at(c("Area.12"), remove)
+
+removed.boi[, c(7)] <- sapply(removed.boi[, c(7)], as.numeric)
+
+removed.boi <- removed.boi %>% 
+  mutate(Area.12 = (sqrt(Area.12)*2.54)^2) %>%
+  mutate(Area.1 = (sqrt(Area.1)*2.54)^2)
+
+head(removed.boi)
+
+View(wide.boi)
+```
+
+```{r}
+parents <- removed.boi %>%
+  filter(Strain == "431alpha" | Strain == "XL280alpha" | Strain == "XL280a")
+
+ggplot(removed.boi, aes(reorder(Strain, Area.12), Area.12)) +
+  geom_point(color = 'gray70', size = 2) +
+  geom_point(data =parents, aes(reorder(Strain, Area.12), Area.12, color = Strain), size = 3) +
+  p +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  xlab("Strain") +
+  ylab("Growth (cm^2)") +
+  ggtitle("XL280x431 Amoeba Assay") +
+  theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+```
+
+```{r}
+#write_csv(removed.boi, "C:\\Users\\Thomas\\Documents\\XL280x431_cross_amoeba_processed_10_23_2020.csv")
+```
+
+```{r}
+names(removed.boi)
+```
+
+
+```{r}
+ggplot(removed.boi, aes(reorder(Strain, Area.12), Area.12)) +
+  geom_point(aes(color = Replicate), size = 2, alpha = 0.5) +
+  geom_boxplot() +
+  p +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  xlab("Strain") +
+  ylab("Growth (cm^2)") +
+  ggtitle("XL280x431 Amoeba Assay") +
+  theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+
+ggplot(removed.boi, aes(reorder(Strain, Area.12), Area.12)) +
+  geom_point(aes(color = Replicate), size = 2) +
+  p +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  xlab("Strain") +
+  ylab("Growth (cm^2)") +
+  ggtitle("XL280x431 Amoeba Assay") +
+  theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+```
+```{r}
+ggplot(removed.boi, aes(as.numeric(passage), Area.12)) +
+  geom_beeswarm(aes(color = plate), size = 2) +
+  ylab(expression("Halo Area" ~ (cm^{2}))) +
+  xlab("Passage #") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  stat_summary(fun = mean, geom = "point", shape = 18, size = 5, color = "black") +
+  p
+
+#ggsave(filename = "C:\\Users\\Thomas\\Documents\\XL280_Halo_swarm_run.png",width = 300, height = 200, device = png(), plot = last_plot(), dpi = 300, units = "mm")
+```
+
+```{r}
+ggplot(removed.boi, aes(Replicate, Area.12)) +
+  geom_beeswarm(aes(color = Replicate), size = 2) +
+  ylab(expression("Halo Area" ~ (cm^{2}))) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none") +
+  stat_summary(fun = mean, geom = "point", shape = 18, size = 5, color = "black") +
+  p
+
+#ggsave(filename = "C:\\Users\\Thomas\\Documents\\XL280_halo_swarm_replicate.png", 
+#       width = 300, height = 200, device = png(), plot = last_plot(), dpi = 300, units = "mm")
+```
+
+```{r}
+ggplot(removed.boi, aes(Stack, Area.12)) +
+  geom_beeswarm(aes(color = Stack), size = 2) +
+  ylab(expression("Halo Area" ~ (cm^{2}))) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  p
+```
+
+```{r}
+ggplot(removed.boi, aes(x=Area.12)) + 
+ geom_histogram(aes(y=..density..), colour="black", fill="grey70")+
+ geom_density(alpha=.3, fill="#6b85cb") +
+  p +
+  xlab(expression("Halo Area" ~ (cm^{2}))) +
+  facet_wrap(~plate)
+
+ggplot(removed.boi, aes(x=Area.12)) + 
+ geom_histogram(aes(y=..density..), colour="black", fill="grey70")+
+ geom_density(alpha=.3, fill="#6b85cb") +
+  p +
+  xlab(expression("Halo Area" ~ (cm^{2}))) +
+  facet_wrap(~Replicate)
+```
+```{r}
+View(unique(removed.boi$Strain))
+```
+
+```{r}
+ranked.boi <- removed.boi %>%
+  filter(Area.12 != 'NA') %>%
+  group_by(Replicate) %>%
+  mutate(ranked = rank(Area.12)) %>%
+#  select(-stack_position, -Area.1, -Area.12) %>%
+  spread(Replicate, ranked) %>%
+  gather(Replicate, ranked, c('1', '2', '3')) %>%
+  filter(ranked != 'NA')
+
+head(ranked.boi)
+```
+
+```{r}
+max(ranked.boi$ranked)
+```
+
+```{r}
+ggplot(ranked.boi, aes(reorder(Strain, ranked), ranked)) +
+  geom_point(aes(color = Replicate), size = 2) +
+  p +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  xlab("Strain") +
+  ylab("Rank") +
+  ggtitle("XL280x431 Amoeba Assay") +
+  theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+```
+```{r}
+test <- ranked.boi %>%
+  filter(Replicate == 3)
+
+length(unique(test$ranked))
+```
+
+```{r}
+ggplot(ranked.boi, aes(reorder(Strain, ranked), ranked)) +
+  geom_point(aes(color = Replicate), size = 2) +
+  p +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  xlab("Strain") +
+  ylab("Rank") +
+  ggtitle("XL280x431 Amoeba Assay") +
+  theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) +
+  facet_wrap(~Replicate)
+```
+```{r}
+test <- c("a", "b", "c")
+
+typeof(test)
+```
+
+```{r}
+sampled <- as.data.frame(ranked.boi$Strain) %>%
+  slice_sample(n=10) %>%
+  rename('ranked.boi$Strain' = 'Strain') %>%
+  as.character()
+  
+
+sampled
+```
+
+```{r}
+sampled <- ranked.boi %>%
+  select(Strain) %>%
+  slice_sample(n=10)
+```
+
+
+```{r}
+ranked.boi %>%
+  filter(Strain %in% sampled$Strain) %>%
+  ggplot(aes(reorder(Strain, ranked), ranked)) +
+  geom_beeswarm(aes(color = Replicate), size = 3, alpha = 0.5) +
+  p +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  xlab("Strain") +
+  ylab("Rank")
+```
+
+```{r}
+parents <- ranked.boi %>%
+  filter(Strain == "431alpha" | Strain == "XL280alpha" | Strain == "XL280a")
+
+ggplot(ranked.boi, aes(reorder(Strain, ranked), ranked)) +
+  geom_point(color = 'gray70', size = 2) +
+  geom_point(data =parents, aes(reorder(Strain, ranked), ranked, color = Strain), size = 3) +
+  p +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  xlab("Strain") +
+  ylab("Rank") +
+  theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+```
+```{r}
+head(ranked.boi)
+```
+
+
+```{r}
+ranked.boi %>%
+  filter(!(Strain %in% c('431alpha', 'XL280a', 'KN99', 'B373', 'B377', 'B575', 'B383'))) %>%
+  select(Strain, Replicate, ranked) %>%
+  pivot_wider(id_cols = c('Strain'), names_from = Replicate, values_from = ranked) %>%
+  ggpairs(columns = 2:4)
+```
+
+```{r}
+ggsave("C:/Users/tsauters/Pictures/scientific figures/XL280cross_rank_cor.png",
+       height = 7, width = 9, dpi = 150)
+```
+
+
+```{r}
+removed.boi %>%
+  filter(!(Strain %in% c('431alpha', 'XL280a', 'KN99', 'B373', 'B377', 'B575', 'B383'))) %>%
+  select(Strain, Replicate, Area.12) %>%
+  pivot_wider(id_cols = c('Strain'), names_from = Replicate, values_from = Area.12) %>%
+  .[,2:4]
+```
+
+```{r}
+removed.boi %>%
+  filter(!(Strain %in% c('431alpha', 'XL280a', 'KN99', 'B373', 'B377', 'B575', 'B383'))) %>%
+  select(Strain, Replicate, Area.12) %>%
+  pivot_wider(id_cols = c('Strain'), names_from = Replicate, values_from = Area.12) %>%
+  ggpairs(columns = 2:4)
+```
+
+```{r}
+ggsave("C:/Users/tsauters/Pictures/scientific figures/XL280cross_cor.png",
+       height = 7, width = 9, dpi = 150)
+```
+
+```{r}
+write_csv(removed.boi, "C:\\Users\\Thomas\\Documents\\XL280x431_cross_amoeba_processed_01_08_2021.csv")
+```
+
+```{r}
+aov_plate <- aov(Area.12 ~ plate, data = removed.boi)
+
+summary(aov_plate)
+```
+
+```{r}
+TukeyHSD(aov_plate)
+```
+
+```{r}
+kruskal.test(Area.12 ~ plate, data = removed.boi)
+```
+
+```{r}
+pairwise.wilcox.test(removed.boi$Area.12, removed.boi$plate, p.adjust.method = "BH")
+```
+
+```{r}
+kruskal.test(Area.12 ~ Replicate, data = removed.boi)
+```
+
+```{r}
+pairwise.wilcox.test(removed.boi$Area.12, removed.boi$Replicate, p.adjust.method = "BH")
+```
+```{r}
+head(removed.boi)
+```
+
+```{r}
+controls <- c("431alpha", "XL280a", "XL280alpha", "KN99", "Kn99")
+```
+Fruit= recode(Fruit, "'apple'='lemon'"))
+```{r}
+kn99 <- c(KN99 = "Kn99")
+
+Parentals <- removed.boi %>%
+  filter(Strain %in% controls) %>%
+  mutate(Strain = recode(Strain, 'Kn99' = 'KN99')) #rename Kn99 to KN99
+
+
+
+head(Parentals)
+```
+
+```{r}
+write_csv(Parentals, "C:\\Users\\Thomas\\Documents\\XL280x431_amoeba_parents.csv")
+```
+

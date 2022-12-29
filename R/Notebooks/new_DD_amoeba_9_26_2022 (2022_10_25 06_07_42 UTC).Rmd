@@ -1,0 +1,471 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(magrittr)
+library(stringr)
+library(ggplot2)
+library(forcats)
+library(cowplot)
+library(broom)
+library(ggbeeswarm)
+library(data.table)
+library(GGally)
+library(conover.test)
+library(ggrepel)
+library(dplyr)
+library(ggsignif)
+
+p <- theme(text = element_text(size = 20), plot.title = element_text(size = 30, face = "bold")) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.line = element_line(colour = "black"), plot.title = element_text(hjust = 0.5))
+```
+
+
+```{r}
+# Original processed (with area from day 1 removed) in a previous notebook that ended up being overwritten
+
+proc.meb <- read.csv("../Data/Processed_DD_amoeba_9_12_2022_18.csv")
+
+proc.meb %<>%
+  select(-X)
+
+proc.meb
+```
+
+```{r}
+bt103 <- read.csv("../Data/DD_amoeba_9_15_2022.csv")
+```
+
+```{r}
+bt103 %<>% dplyr::select(-Mean, -Min, -Max)
+
+head(bt103)
+```
+
+```{r}
+wide.bt103 <- bt103 %>%
+  filter(is.na(Issues)) %>%
+  dplyr::select(-Issues) %>%
+  arrange(Strain, Day) %>%
+  unite("Strain", c("Strain", "Replicate", "Passage", "Date"), sep = "&") %>%
+  reshape(idvar = "Strain", timevar = "Day", direction = "wide") %>%
+  separate("Strain", c("Strain", "Replicate", "Passage", "Date"), sep = "&")
+
+#wide.boi <- na.omit(wide.boi)
+
+remove <- function(x, na.rm = TRUE) (
+  x - wide.bt103$`Area.1`
+)
+
+removed.bt103 <- wide.bt103 %>% mutate_at(c("Area.18"), remove)
+
+#removed.df[, c(7)] <- sapply(removed.df[, c(7)], as.numeric)
+
+removed.bt103 <- removed.bt103 %>% 
+  mutate(Area.18 = (sqrt(Area.18)*2.54)^2) %>%
+  mutate(Area.1 = (sqrt(Area.1)*2.54)^2) %>%
+  filter(!is.na(Area.12) & !is.na(Area.1)) %>%
+  select(-Area.12, -Area.1) %>%
+  transform(Passage = as.numeric(Passage), Replicate = as.numeric(Replicate))
+
+head(removed.bt103)
+```
+```{r}
+head(proc.meb)
+```
+
+```{r}
+removed.df <- rbind(removed.bt103, proc.meb)
+
+removed.df
+```
+```{r}
+moremeb
+```
+
+
+```{r}
+amoeba75 <- "../Data/Amoeba_7_5_2022.csv"
+
+moremeb <- read.csv(amoeba75)
+
+remove <- function(x, na.rm = TRUE) (
+  x - moremeb$`Area.1`
+)
+
+moremeb <- moremeb %>% mutate_at(c("Area.18"), remove)
+
+moremeb %<>%
+  select(-X) %>%
+  filter(Strain != "Bt103") %>%#this was labelled as Bt103 but it is Bt130
+  select(-Area.12, -Area.1)
+
+head(moremeb)
+```
+
+```{r}
+fulldf <- rbind(removed.df, moremeb)
+
+head(fulldf)
+```
+
+```{r}
+head(fulldf)
+```
+
+
+```{r}
+data_summary <- function(data, varname, groupnames){
+  require(plyr)
+  summary_func <- function(x, col){
+    c(mean = mean(x[[col]], na.rm=TRUE),
+      sd = sd(x[[col]], na.rm=TRUE))
+  }
+  data_sum<-ddply(data, groupnames, .fun=summary_func,
+                  varname)
+  data_sum <- rename(data_sum, c("mean" = varname))
+ return(data_sum)
+}
+```
+
+
+```{r}
+fulldf.sd <- data_summary(fulldf, varname = "Area.18", groupnames = c("Strain"))
+
+head(fulldf.sd)
+
+detach("package:plyr", unload=TRUE) # the plyr requirement for the function breaks dplyr, unless I add this here. Loading the dplyr library again doesn't fix it, somehow this does.
+```
+```{r}
+unique(fulldf.sd$Strain)
+```
+
+```{r}
+strain_list <- c("Ftc555-1", "F9", "F1", "Bt22", "Bt45", "Bt75", "Bt103", "Bt102")
+
+amoebafig <- fulldf.sd %>%
+  filter(Strain %in% strain_list)
+
+amoebafig$Strain  <- factor(amoebafig$Strain, levels = strain_list)
+
+amoebafig %>%
+  ggplot(aes(Strain, Area.18)) +
+  geom_col(aes(fill = Strain), size = 1, color = "Black",
+           position = position_dodge(), width = 0.75) +
+  geom_errorbar(aes(ymin=Area.18-sd, ymax=Area.18+sd), 
+                width=.2, size = 1) +
+  coord_fixed(.1) +
+  scale_x_discrete(labels = c("Ftc555-1" = "Ftc555-1",
+                              "Bt22"= "Bt22",
+                              "F9" = expression(paste("Ftc555-1",
+                                              italic("bzp4::NAT"))),
+                              "F1" = expression(paste("Ftc555-1",                                                       italic("bzp4::NAT"))),
+                              "Bt45" = "Bt45",
+                              "Bt75" = "Bt75",
+                              "Bt102" = "Bt102",
+                              "Bt103" = "Bt103"
+                   )) +
+  xlab("Strain") +
+  ylab(expression("Amoeba Halo Area" ~ (cm^{2}))) +
+  scale_fill_manual(values = c('Bt22' = "dodgerblue3",
+                               'Ftc555-1' = "chocolate1",
+                               'Bt45' = "dodgerblue4",
+                               'F9' = "chocolate3",
+                               'F1' = "chocolate3",
+                               'Bt75' = "dodgerblue4",
+                               'Bt102' = "dodgerblue4",
+                               'Bt103' = "dodgerblue4"
+                               ),
+                    guide = "none") +
+  theme(text = element_text(size = 30),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(size = 40, face = "bold"),
+        legend.title = element_blank(),
+        legend.position = "none",
+        panel.background = element_blank(),
+        panel.border = element_rect(color = "black",
+                                    fill = NA,
+                                    size = 1))
+
+ggsave("Ftc_KO_bt45_comparison.png", path = "C:/Users/tsauters/Pictures/scientific figures/Thesis/chapter2/",
+       height = 7, width = 12)
+```
+
+```{r}
+strain_list <- c("Ftc555-1", "F9", "F1", "Bt22", "Bt45")
+
+amoebafig <- fulldf.sd %>%
+  filter(Strain %in% strain_list)
+
+amoebafig$Strain  <- factor(amoebafig$Strain, levels = strain_list)
+
+amoebafig %>%
+  ggplot(aes(Strain, Area.18)) +
+  geom_col(aes(fill = Strain), size = 1, color = "Black",
+           position = position_dodge(), width = 0.75) +
+  geom_errorbar(aes(ymin=Area.18-sd, ymax=Area.18+sd), 
+                width=.2, size = 1) +
+  coord_fixed(.1) +
+  scale_x_discrete(labels = c("Ftc555-1" = "Ftc555-1",
+                              "Bt22"= "Bt22",
+                              "F9" = expression(paste("Ftc555-1",
+                                              italic("bzp4::NAT"))),
+                              "F1" = expression(paste("Ftc555-1",                                                       italic("bzp4::NAT"))),
+                              "Bt45" = "Bt45"
+                   )) +
+  xlab("Strain") +
+  ylab(expression("Amoeba Halo Area" ~ (cm^{2}))) +
+  scale_fill_manual(values = c('Bt22' = "dodgerblue3", 'Ftc555-1' = "chocolate1", 'Bt45' = "dodgerblue4", 'F9' = "chocolate3", 'F1' = "chocolate3"), guide = "none") +
+  theme(text = element_text(size = 30),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(size = 40, face = "bold"),
+        legend.title = element_blank(),
+        legend.position = "none",
+        panel.background = element_blank(),
+        panel.border = element_rect(color = "black",
+                                    fill = NA,
+                                    size = 1)) #+
+#  geom_signif(
+#    comparisons = list(c("Bt22", "PMY2768")),
+#    annotation = c("****" ),
+#    y_position = c(27)
+#  )
+
+ggsave("Ftc_KO_bt45_comparison_limited.png", path = "C:/Users/tsauters/Pictures/scientific figures/Thesis/chapter2/",
+       height = 7, width = 12)
+```
+
+```{r}
+strain_list <- c("Ftc555-1","Bt22", "Bt75", "Bt102", "Bt103")
+
+amoebafig <- fulldf.sd %>%
+  filter(Strain %in% strain_list)
+
+amoebafig$Strain  <- factor(amoebafig$Strain, levels = strain_list)
+
+amoebafig %>%
+  ggplot(aes(Strain, Area.18)) +
+  geom_col(aes(fill = Strain), size = 1, color = "Black",
+           position = position_dodge(), width = 0.75) +
+  geom_errorbar(aes(ymin=Area.18-sd, ymax=Area.18+sd), 
+                width=.2, size = 1) +
+  coord_fixed(.1) +
+#  scale_x_discrete(labels = c("Ftc555-1" = "Ftc555-1",
+#                              "Bt22"= "Bt22",
+#                              "F9" = expression(paste("Ftc555-1",
+#                                              italic("bzp4::NAT"))),
+#                              "F1" = expression(paste("Ftc555-1",          #                                             italic("bzp4::NAT"))),
+#                              "Bt45" = "Bt45"
+#                   )) +
+  xlab("Strain") +
+  ylab(expression("Amoeba Halo Area" ~ (cm^{2}))) +
+#  scale_fill_manual(values = c('Bt22' = "dodgerblue3", 'Ftc555-1' = "chocolate1", 'Bt45' = "dodgerblue4", 'F9' = "chocolate3", 'F1' = "chocolate3"), guide = "none") +
+  theme(text = element_text(size = 30),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(size = 40, face = "bold"),
+        legend.title = element_blank(),
+        legend.position = "none",
+        panel.background = element_blank(),
+        panel.border = element_rect(color = "black",
+                                    fill = NA,
+                                    size = 1))
+```
+
+```{r}
+test<-fulldf %>%
+  filter(Strain %in% strain_list) #%>%
+pairwise.t.test(test$Area.18, test$Strain, p.adjust.method = "holm")
+```
+
+
+```{r}
+melpath <- "C:\\Users\\tsauters\\Documents\\Melanin_measurements_09_26_2022.csv"
+melanin <- read.csv(melpath)
+
+head(melanin)
+```
+
+
+```{r}
+mebmel <- merge(melanin, fulldf, by = 'Strain')
+
+mebmel %<>%
+#  select(-Area, -Max, -Min) %>%
+  group_by(Strain) %>%
+  mutate(Halo_mean_18 = mean(Area.18)) %>%
+  select(Strain, Day, Mean, Halo_mean_18, Bzp_LOF) %>%
+  unique()
+
+head(mebmel)
+```
+
+```{r}
+Amoeba_max <- max(mebmel$Halo_mean_18)
+
+Amoeba_axis <- Amoeba_max*0.95
+
+Mel2 <- mebmel %>%
+  filter(Day == 2)
+
+Mel2_max <- max(Mel2$Mean)
+
+Mel2_axis <- Mel2_max*0.95
+```
+
+
+```{r}
+mebmel %>%
+  filter(!(Strain %in% c("F1", "F9"))) %>%
+  ggplot(aes(Mean, Halo_mean_18)) +
+    geom_point(aes(color = Bzp_LOF), size = 5) +
+    geom_text_repel(aes(label = Strain), size = 6) +
+    ylab(expression("Amoeba Halo Area" ~ (cm^{2}))) +
+    xlab("Light Reflected") +
+  annotate("text", x = Mel2_axis - (0.3*Mel2_axis), y = Amoeba_axis, 
+           label = (expression(R^{2} ~ "= 0.2389")),
+           size = 7) +
+  annotate("text", x = Mel2_axis - (0.3*Mel2_axis), y = Amoeba_axis - (.1*Amoeba_axis), 
+           label = "p = 0.0901",
+           size = 7) +
+    theme(text = element_text(size = 30),
+          axis.title = element_text(size = 30,
+                                    #face = "bold",
+                                    hjust = 0.5),
+          
+          legend.position = 'none',
+          panel.background = element_blank(),
+          panel.border = element_rect(color = "black",
+                                    fill = NA,
+                                    size = 1),
+          plot.margin = margin(1,1,1.5,1.2, "cm"))
+
+#ggsave("C:/Users/tsauters/Desktop/DD_amoeba_melanin_correlation_new_large.png",
+#       height = 7, width = 9, dpi = 150)
+```
+
+```{r}
+
+ggsave("../Figures/DD_amoeba_melanin_correlation_new_large.png",
+       height = 7, width = 9, dpi = 150)
+```
+
+```{r}
+mel2 <- mebmel %>%
+  filter(!(Strain %in% c("F1", "F9")))
+
+head(mel2)
+```
+
+```{r}
+shapiro.test(mel2$Mean)
+```
+
+```{r}
+
+halmel2.lm <- lm(Halo_mean_18~Mean, mel2)
+
+summary(halmel2.lm)
+```
+
+```{r}
+nh99 <- mel2 %>%
+  filter(Strain != "H99")
+
+nh99.lm <- lm(Halo_mean_18~Mean, nh99)
+
+summary(nh99.lm)
+```
+
+```{r}
+mebmel %>%
+  filter(!(Strain %in% c("F1", "F9", "H99"))) %>%
+  ggplot(aes(Mean, Halo_mean_18)) +
+    geom_point(aes(color = Bzp_LOF), size = 5) +
+    geom_text_repel(aes(label = Strain), size = 6) +
+    ylab(expression("Amoeba Halo Area" ~ (cm^{2}))) +
+    xlab("Light Reflected") +
+  annotate("text", x = Mel2_axis - (0.3*Mel2_axis), y = Amoeba_axis, 
+           label = (expression(R^{2} ~ "= 0.58")),
+           size = 7) +
+  annotate("text", x = Mel2_axis - (0.3*Mel2_axis), y = Amoeba_axis - (.1*Amoeba_axis), 
+           label = "p = 0.00397",
+           size = 7) +
+  geom_abline(slope = nh99.lm$coefficients[2], intercept = nh99.lm$coefficients[1], color='red', linetype = "longdash") +
+    theme(text = element_text(size = 30),
+          axis.title = element_text(size = 30,
+                                    #face = "bold",
+                                    hjust = 0.5),
+          
+          legend.position = 'none',
+          panel.background = element_blank(),
+          panel.border = element_rect(color = "black",
+                                    fill = NA,
+                                    size = 1),
+          plot.margin = margin(1,1,1.5,1.2, "cm"))
+
+#ggsave("C:/Users/tsauters/Desktop/DD_amoeba_melanin_correlation_noH99_large.png",
+#       height = 7, width = 9, dpi = 150)
+```
+
+```{r}
+
+ggsave("../Figures/DD_amoeba_melanin_correlation_noH99_large.png",
+       height = 7, width = 9, dpi = 150)
+```
+
+```{r}
+regres <- function(X, Y, c, d) {
+  # X variable 1
+  # Y variable 2
+  # c intercept lm$coefficients[1]
+  # d slope     lm$coefficients[2]
+  
+  
+  X.ctr <- X - mean(X)
+  Y.ctr <- Y - mean(Y)
+
+  b.est <- (X.ctr %*% Y.ctr)/(X.ctr %*% X.ctr)
+  a.est <- mean(Y) - b.est * mean(X)
+
+  regression <- list(intercept = drop(a.est), slope = drop(b.est))
+  
+  intercept <- c
+  slope <- d
+
+  Yhat <- intercept + slope * X
+  e <- Y - Yhat
+  
+  tibble(X = X, Y = Y, fitted = Yhat, residuals = e)
+}
+```
+
+```{r}
+mel2.lm <- regres(mel2$Mean, mel2$Halo_mean_18, halmel2.lm$coefficients[1], halmel2.lm$coefficients[2])
+```
+
+```{r}
+ggplot(mel2.lm, aes(X,Y)) +
+  geom_point(color='black', size = 3) +
+  geom_abline(slope = halmel2.lm$coefficients[2], intercept = halmel2.lm$coefficients[1], color='red') +
+  xlab("Light Reflected") +
+  ylab("Amoeba Growth") +
+#  annotate("text", x = 2500, y = 20, 
+#           label = (expression(R^{2} ~ "= 0.1102"))) + 
+#  annotate("text", x = 2500, y = 19, 
+#           label = "r = 0.332") +
+
+  p
+```
+
+```{r}
+ggplot(mel2.lm, aes(X, residuals)) + 
+  geom_point() + 
+  geom_hline(yintercept = 0, color = 'red', linetype = "dashed") + 
+  labs(x = "X", y = "Residuals") +
+  geom_segment(aes(xend = X, yend = 0),
+               color='red', linetype='dashed', alpha=0.35) +
+  p
+```

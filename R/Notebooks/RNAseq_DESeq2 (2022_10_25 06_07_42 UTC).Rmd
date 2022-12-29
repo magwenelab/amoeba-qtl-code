@@ -1,0 +1,410 @@
+---
+title: "deseq2"
+author: "Thomas J. Sauters"
+date: "2022-09-23"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(magrittr)
+library(stringr)
+library(forcats)
+library(cowplot)
+library(broom)
+library(RColorBrewer)
+library(gplots)
+library(ggVennDiagram)
+library(ggbeeswarm)
+library(DESeq2)
+library(GGally)
+library(VennDiagram)
+
+p <- theme(text = element_text(size = 20), plot.title = element_text(size = 30, face = "bold")) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.line = element_line(colour = "black"), plot.title = element_text(hjust = 0.5))
+```
+
+## Initial data wrangling/ transcript abundance
+
+```{r}
+mypath0 <- "C:/Users/tsauters/Documents/RNAseq_data_236_cor.csv"
+
+rna <- read.csv(mypath0)
+
+rna$est_counts <- as.numeric(rna$est_counts)
+
+head(rna)
+```
+
+### Bring in segregant information
+```{r}
+mypath1 <- "C:/Users/tsauters/Documents/RNAseq_strain_info.csv"
+
+info <- read.csv(mypath1)
+
+info %<>% 
+  rename('sample' = 'Strain') %>%
+  select(!condition)
+
+info$Chr_8 <- as.factor(info$Chr_8)
+
+head(info)
+```
+### Make a condition specific column for later splitting of the data
+```{r}
+rna_con <- rna %>%
+  mutate(condition = ifelse(str_detect(Strain, 'a'),
+                'amoeba', 'control'))
+
+head(rna_con)
+```
+### Add strain data to the transcript abundance df
+### Split data by conditions
+```{r}
+rna_con_loc <- merge(rna_con, info, by = 'Strain')
+
+control <- rna_con_loc %>%
+  filter(condition == "control")
+
+amoeba <- rna_con_loc %>%
+  filter(condition == "amoeba")
+
+head(amoeba)
+```
+
+```{r}
+deseq_prep <- function(df){# Prep the count and categorical information
+  counts.mtrx <- df %>%
+  select(target_id, est_counts, Strain) %>%
+  pivot_wider(values_from = est_counts, names_from = Strain, id_cols = target_id) %>%
+  as.data.frame()
+  
+  rownames(counts.mtrx) <- counts.mtrx$target_id
+
+  counts.mtrx %<>% select(-target_id)
+
+  counts.mtrx[is.na(counts.mtrx)] <- 0.0
+  
+  clmdata <- df %>%
+  select(Strain, condition, Chr_8) %>%
+  unique()
+
+  rownames(clmdata) <- clmdata$Strain
+
+  clmdata %<>% select(-Strain)
+  
+  counts.mtrx <- counts.mtrx[, rownames(clmdata)]
+  all(rownames(clmdata) == colnames(counts.mtrx))
+  
+  both <- list('counts.mtrx' = counts.mtrx, 'clmdata' = clmdata)
+  
+  return(both)
+}
+
+deseq_calc <- function(counts.mtrx, clmdata, Formula){ # formula is like a linear model "~ condition + Chr_8 + condition:Chr_8"
+  dds2 <- DESeqDataSetFromMatrix(countData = round(counts.mtrx),
+                              colData = clmdata,
+                              design = Formula)
+  
+  keep <- rowSums(counts(dds2)) >= 10 # only use genes with greater than 10 reads mapped
+  dds2 <- dds2[keep,]
+  
+  dds2 <- DESeq(dds2)
+  res2 <- results(dds2)
+  
+  prep_and_map <- list('res2' = res2, 'dds2' = dds2)
+  return(prep_and_map)
+}
+```
+
+### Create counts matrices and categorical data for both conditions
+```{r}
+amoeba_sets <- deseq_prep(amoeba)
+
+control_sets <- deseq_prep(control)
+
+amoeba_sets$counts.mtrx
+```
+
+###Using the deseq function the counts are normalized, differential expression is calculated using the provided formula, and significance is determined.
+```{r}
+amoeba_prep <- deseq_calc(amoeba_sets$counts.mtrx, amoeba_sets$clmdata, ~ Chr_8)
+
+control_prep <- deseq_calc(control_sets$counts.mtrx, control_sets$clmdata, ~ Chr_8)
+```
+
+```{r}
+head(amoeba_prep)
+```
+
+
+```{r}
+conqtl <- results(control_prep$dds2,
+                  contrast = c("Chr_8", "0", "1"))
+
+
+amoebqtl <- results(amoeba_prep$dds2,
+                  contrast = c("Chr_8", "0", "1"))
+```
+
+```{r}
+conqtl[1:5,]
+amoebqtl[1:5,]
+```
+
+```{r}
+condf <- conqtl %>%
+  as.data.frame()
+
+condf <- cbind(target_id = rownames(condf), condf)
+rownames(condf) <- 1:nrow(condf)
+
+condf %<>%
+  mutate('Condition' = "control")
+
+amoebadf <- amoebqtl %>%
+  as.data.frame()
+#  filter(target_id == "CNAG_03346-t26_1")
+
+
+amoebadf <- cbind(target_id = rownames(amoebadf), amoebadf)
+rownames(amoebadf) <- 1:nrow(amoebadf)
+
+amoebadf %<>%
+  mutate('Condition' = "amoeba")
+
+head(amoebadf)
+
+```
+
+### recombine conditional data for analysis
+```{r}
+alldf <- rbind(amoebadf, condf)
+
+head(alldf)
+```
+
+### bring in information on genes of interest
+```{r}
+mypath2 <- "C:/Users/tsauters/Documents/RNA_seq_8_mel_genes.csv"
+
+gene_names <- read.csv(mypath2)
+
+head(gene_names)
+```
+### Join differential expression data and gene names
+```{r}
+allgenes <- merge(gene_names, alldf, by = "target_id")
+
+head(allgenes)
+```
+
+```{r}
+chrom8_mn <- c('CNAG_03342-t26_1', 'CNAG_03343-t26_1', 'CNAG_03344-t26_1', 'CNAG_03345-t26_2', 'CNAG_03346-t26_1', 'CNAG_03347-t26_1', 'CNAG_03348-t26_1', 'CNAG_03349-t26_1', 'CNAG_03352-t26_1', 'CNAG_03353-t26_1', 'CNAG_03354-t26_1', 'CNAG_03356-t26_1', 'CNAG_03357-t26_1', 'CNAG_03358-t26_1', 'CNAG_03360-t26_1', 'CNAG_03361-t26_1', 'CNAG_03362-t26_1', 'CNAG_03363-t26_1', 'CNAG_03364-t26_1', 'CNAG_03365-t26_1', 'CNAG_03365-t26_2', 'CNAG_03366-t26_1', 'CNAG_03366-t26_2', 'CNAG_07724-t26_1')
+```
+### Select the genes under the Chr 8 peak
+```{r}
+qtl_8 <- allgenes %>%
+  filter(target_id %in% chrom8_mn)
+
+qtl_8
+```
+
+```{r}
+qtl_8 %>%
+  filter(Condition == "amoeba") %>%
+  ggplot(aes(Gene, log2FoldChange)) +
+  geom_point(aes(color = log2FoldChange), size = 4) +
+  scale_color_gradient2(low = "chocolate1", mid = "darkgrey", high = "dodgerblue3") +
+#  geom_jitter(aes(color = as.character(Chr_8))) +
+  p +
+  coord_flip() +
+  xlab("Gene") +
+  geom_hline(yintercept = 0, 
+             linetype = "dashed", size = 1, alpha = 0.75, color = "black") +
+  ylab("Fold Change\n (Bt22/Ftc555-1)") +
+  theme(legend.title = element_blank())
+```
+
+```{r}
+ggsave("../Figures/Fold_change_dot.png",
+       height = 7, width = 9, dpi = 150)
+```
+
+```{r}
+qtl_8 %>%
+  filter(Condition == "amoeba") %>%# &
+#           target_id != "CNAG_03365-t26_1") %>%
+  ggplot(aes(Condition, reorder(Gene, log2FoldChange))) +
+  geom_tile(aes(fill = log2FoldChange)) +
+  scale_fill_gradient2(low = "chocolate1", mid = "white", high = "dodgerblue3") +
+  ylab("Gene") +
+  xlab("") +
+  theme(legend.title = element_blank()) +
+  p
+```
+
+```{r}
+ggsave("../Figures/Fold_change_heat.png",
+       height = 7, width = 9, dpi = 150)
+```
+
+
+```{r}
+melanin <- c("CNAG_01431-t26_1", "CNAG_01523-t26_1", "CNAG_02680-t26_1", "CNAG_04215-t26_1", "CNAG_06697-t26_1", "CNAG_06697-t26_2", "CNAG_00396-t26_1", "CNAG_02233-t26_1", "CNAG_05420-t26_1", "CNAG_07464-t26_1", "CNAG_06730-t26_1", "CNAG_06730-t26_2", "CNAG_00405-t26_1", "CNAG_03465-t26_1", "CNAG_03346-t26_1", "CNAG_02915-t26_1", "CNAG_05386-t26_1", "CNAG_05386-t26_2", "CNAG_03567-t26_1", "CNAG_00405-t26_1", "CNAG_01773-t26_1", "CNAG_03821-t26_1", "CNAG_07724-t26_1", "CNAG_04864-t26_1", "CNAG_00979-t26_1", "CNAG_06242-t26_1", "CNAG_06241-t26_1", "CNAG_05431-t26_1", "CNAG_01653-t26_1")
+
+```
+### Select the major genes in the melanin synthesis pathway
+```{r}
+qtl_mel <- allgenes %>%
+  filter(target_id %in% melanin)
+
+qtl_mel
+```
+
+```{r}
+qtl_mel %>%
+  filter(Condition == "amoeba" &
+           !(Gene %in% c("CFO1", "CFT1", "CIG1"))) %>%
+  ggplot(aes(Gene, log2FoldChange)) +
+  geom_point(aes(color = log2FoldChange), size = 4) +
+  scale_color_gradient2(low = "chocolate1", mid = "darkgrey", high = "dodgerblue3") +
+#  geom_jitter(aes(color = as.character(Chr_8))) +
+  p +
+  coord_flip() +
+  xlab("Gene") +
+  geom_hline(yintercept = 0, 
+             linetype = "dashed", size = 1, alpha = 0.75, color = "black") +
+  ylab("Fold Change\n (Bt22/Ftc555-1)") +
+  theme(legend.title = element_blank())
+```
+
+```{r}
+ggsave("../Figures/Fold_change_mel_dot.png",
+       height = 7, width = 9, dpi = 150)
+```
+
+```{r}
+qtl_mel %>%
+  filter(Condition == "amoeba" &
+           !(Gene %in% c("CFO1", "CFT1", "CIG1"))) %>%
+  ggplot(aes(Condition, reorder(Gene, log2FoldChange))) +
+  geom_tile(aes(fill = log2FoldChange)) +
+  scale_fill_gradient2(low = "chocolate1", mid = "white", high = "dodgerblue3") +
+  ylab("Gene") +
+  xlab("") +
+  theme(legend.title = element_blank()) +
+  p
+```
+
+```{r}
+ggsave("../Figures/Fold_change_mel_heat.png",
+       height = 7, width = 9, dpi = 150)
+```
+
+
+```{r}
+head(allgenes)
+```
+### Filtering for genes with greater than 1 log2 differential expression that are also significantly different, how many genes are differentially expressed overall
+```{r}
+diffgenes <- alldf %>%
+  filter((log2FoldChange >= 1) | (log2FoldChange <= -1)) %>%
+  filter((pvalue <= 0.05)) %>%
+  separate(col = 'target_id', sep = "-", into = c("target_id", NA)) %>%
+  select(target_id) %>%
+  unique() # necessary to filter out multiple transcripts of the same gene
+
+dim(diffgenes)
+```
+
+### For amoeba, ask the same question as above
+```{r}
+mebgenes <- alldf %>%
+  filter((log2FoldChange >= 1) | (log2FoldChange <= -1)) %>%
+  filter((pvalue <= 0.05) &
+           (Condition == "amoeba")) %>%
+  separate(col = 'target_id', sep = "-", into = c("target_id", NA)) %>%
+  select(target_id) %>%
+  unique()
+
+dim(mebgenes)
+```
+
+
+### for control
+```{r}
+congenes <- alldf %>%
+  filter((log2FoldChange >= 1) | (log2FoldChange <= -1)) %>%
+  filter((pvalue <= 0.05) &
+           (Condition == "control")) %>%
+  separate(col = 'target_id', sep = "-", into = c("target_id", NA)) %>%
+  select(target_id) %>%
+  unique()
+
+dim(congenes)
+congenes
+```
+
+### Filter for the top 20 genes in amoeba that are either unique or shared by changing the "!" in the final filter
+```{r}
+alldf %>%
+  filter((log2FoldChange >= 1) | (log2FoldChange <= -1)) %>%
+  filter((pvalue <= 0.05) &
+           (Condition == "amoeba")) %>%
+  separate(col = 'target_id', sep = "-", into = c("target_id", NA)) %>%
+  filter((target_id %in% congenes$target_id)) %>%
+  arrange(log2FoldChange) %>%
+#  .$target_id %>%
+  head(20)
+
+```
+
+### Filter for the top 20 genes in control that are either unique or shared by changing the "!" in the final filter
+```{r}
+alldf %>%
+  filter((log2FoldChange >= 1) | (log2FoldChange <= -1)) %>%
+  filter((pvalue <= 0.05) &
+           (Condition == "control")) %>%
+  separate(col = 'target_id', sep = "-", into = c("target_id", NA)) %>%
+  filter(!(target_id %in% mebgenes$target_id)) %>%
+  arrange(-log2FoldChange) %>%
+  .$target_id %>%
+  head(20)
+
+```
+
+
+```{r}
+mycol <- c("chocolate1", "dodgerblue3")
+
+test <- venn.diagram(
+  x = list(congenes$target_id, mebgenes$target_id),
+  category.names = c("Control" , "Amoeba"),
+  filename = "../Figures/",
+  output=TRUE,
+  
+  lwd = 2,
+  lty = 'blank',
+  fill = mycol,
+  
+  cex = 1,
+  fontface = "bold",
+  fontfamily = "sans",
+  
+  cat.cex = 1,
+  cat.fontface = "bold",
+  cat.default.pos = "outer",
+  cat.fontfamily = "sans"
+)
+
+grid.newpage()
+grid.draw(test)
+```
+
+
+
+
+
+
+

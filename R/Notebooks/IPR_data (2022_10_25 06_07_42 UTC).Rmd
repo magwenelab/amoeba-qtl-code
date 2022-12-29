@@ -1,0 +1,137 @@
+---
+title: "Untitled"
+author: "Thomas J. Sauters"
+date: "2022-08-18"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(magrittr)
+library(stringr)
+library(ggplot2)
+library(ggpubr)
+library(dplyr)
+library(forcats)
+library(cowplot)
+library(broom)
+library(ggbeeswarm)
+library(data.table)
+library(GGally)
+library(conover.test)
+library(ggsignif)
+
+
+p <- theme(text = element_text(size = 20), plot.title = element_text(size = 30, face = "bold")) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.line = element_line(colour = "black"), plot.title = element_text(hjust = 0.5))
+
+ipr <- read.csv("../Data/IPR_data.csv")
+
+pha <- read.csv("../Data/phagocytosis_data.csv")
+```
+
+```{r}
+ipr$Strain <- factor(ipr$Strain, c("PMY2765","PMY2768","Ftc555-1","Bt22","PMY2570","PMY2911","PMY2581")) 
+# rank order of amoeba resistance ^
+```
+
+
+```{r}
+ipr %>%
+  ggplot(aes(Strain, IPR)) +
+  geom_boxplot(aes(fill = Group)) +
+  geom_beeswarm(size = 3, alpha = 0.8) +
+  scale_fill_manual(values = c("A" = "dodgerblue3",
+                               "B" = "chocolate1",
+                               "C" = "chocolate3",
+                               "D" =  "dodgerblue4"
+                               ),
+                   name = "Chr.8 Allele") +
+  scale_x_discrete(labels = c("Bt22" = "Bt22",
+                              "Ftc555-1" = "Ftc555-1",
+                              "PMY2765" = "S1", #high
+                              "PMY2768" = "S2", #high
+                              "PMY2570" = "S3", #low
+                              "PMY2581" = "S4", #Low
+                              "PMY2911" = "S5")) + # low
+  theme(text = element_text(size = 30),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(size = 40, face = "bold"),
+        legend.title = element_blank(),
+        legend.position = "none",
+        panel.background = element_blank(),
+        panel.border = element_rect(color = "black",
+                                    fill = NA,
+                                    size = 1))
+
+ggsave("IPR_fig.png", path = "../Figures/",
+       height = 7, width = 10)
+```
+
+
+```{r}
+IPR.aov <- aov(IPR ~ PMY, data = ipr)
+
+summary(IPR.aov)
+```
+
+```{r}
+pha$Strain <- factor(pha$Strain, c("PMY2765","PMY2768","Ftc555-1","Bt22","PMY2570","PMY2911","PMY2581")) 
+# rank order of amoeba resistance ^
+```
+#remove PMY2715 - too few replicates, and it isn't in the IPR data
+```{r}
+pha %>%
+  filter(Strain != "PMY2715") %>%
+  ggplot(aes(Strain, IPR)) +
+  geom_boxplot(aes(fill = Group)) +
+  geom_beeswarm(size = 3, alpha = 0.8) +
+ scale_fill_manual(values = c("A" = "dodgerblue3",
+                               "B" = "chocolate1",
+                               "C" = "chocolate3",
+                               "D" =  "dodgerblue4"
+                               ),
+                   name = "Chr.8 Allele") +
+  scale_x_discrete(labels = c("Bt22" = "Bt22",
+                              "Ftc555-1" = "Ftc555-1",
+                              "PMY2765" = "S1", #high
+                              "PMY2768" = "S2", #high
+                              "PMY2570" = "S3", #low
+                              "PMY2581" = "S4", #Low
+                              "PMY2911" = "S5")) + # low
+  theme(text = element_text(size = 30),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(size = 40, face = "bold"),
+        legend.title = element_blank(),
+        legend.position = "none",
+        panel.background = element_blank(),
+        panel.border = element_rect(color = "black",
+                                    fill = NA,
+                                    size = 1)) +
+  ylab("Number of Phagocytosed Cells\n (per 100 macrophages)") +
+  geom_signif(
+    comparisons = list(c("Bt22", "PMY2768")),
+    annotation = c("****" ),
+    y_position = c(27)
+  ) +
+  geom_signif(
+    comparisons = list(c("Bt22", "PMY2911")),
+    annotation = c("****"),
+    y_position = c(17)
+  ) +
+  geom_signif(
+    comparisons = list(c("Ftc555-1", "PMY2768")),
+    annotation = c("****" ),
+    y_position = c(25)
+    )+
+  geom_signif(
+    comparisons = list(c("Ftc555-1", "PMY2911")),
+    annotation = c("****"),
+    y_position = c(20)
+  )
+  
+
+ggsave("PI_fig.png", path = "../Figures/",
+       height = 7, width = 10)
+```
+

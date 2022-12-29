@@ -1,0 +1,253 @@
+---
+title: "mouse"
+author: "Thomas J. Sauters"
+date: "2022-09-14"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(magrittr)
+library(stringr)
+library(ggplot2)
+library(ggpubr)
+library(dplyr)
+library(forcats)
+library(cowplot)
+library(broom)
+library(ggbeeswarm)
+library(data.table)
+library(GGally)
+library(ggrepel)
+
+
+p <- theme(text = element_text(size = 20), plot.title = element_text(size = 30, face = "bold")) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"),
+        plot.title = element_text(hjust = 0.5))
+```
+
+```{r}
+mouse <- read.csv("C:/Users/tsauters/Documents/all_mouse_LD50.csv")
+
+mouse
+```
+
+```{r}
+proc.mouse <- mouse %>%
+  within(Day[Perc > 50] <- 190) %>% # changing Day values to greater than max for strains that never reached 50% mortality
+  group_by(Strain) %>%
+  mutate(Day = mean(Day)) %>% # averaging the Bt22 results
+  select(-Perc, -Replicate, -Mice) %>%
+  unique()
+
+proc.mouse
+```
+
+```{r}
+amoebapath <- "C:\\Users\\tsauters\\Documents\\Processed_DD_amoeba_9_12_2022_18.csv"
+
+amoeba <- read.csv(amoebapath)
+
+amoeba %<>%
+  select(-X, -Date) %>%
+  group_by(Strain) %>%
+  mutate(Area = mean(Area.18)) %>%
+  select(-Replicate, -Area.18) %>%
+  unique()
+
+head(amoeba)
+```
+
+
+
+```{r}
+amoeba75 <- "C:\\Users\\tsauters\\Documents\\Amoeba_7_5_2022.csv"
+
+moremeb <- read.csv(amoeba75)
+
+moremeb %<>%
+  select(-X, -Passage, -Date, -Area.1, -Area.12) %>%
+  filter(Strain != "Bt103") %>% #this was labelled as Bt103 but it is Bt130
+  group_by(Strain) %>%
+  mutate(Area = mean(Area.18)) %>%
+  select(-Replicate, -Area.18) %>%
+  unique()
+
+head(moremeb)
+```
+
+```{r}
+mebdf <- rbind(amoeba, moremeb)
+
+mebdf %<>%
+  group_by(Strain) %>%
+  mutate(Area = mean(Area)) %>% #averaging replicates of Bt22 and Ftc555-1
+  unique()
+
+dim(mebdf)
+```
+
+```{r}
+melpath <- "C:\\Users\\tsauters\\Documents\\Melanin_measurements_09_26_2022.csv"
+melanin <- read.csv(melpath)
+
+melanin %<>%
+  select(-Area, -Min, -Max)
+
+head(melanin)
+```
+
+```{r}
+melam <- merge(melanin, mebdf, by = 'Strain')
+
+
+head(melam)
+```
+```{r}
+mouammel
+```
+
+```{r}
+mouammel <- merge(melam, proc.mouse, by = 'Strain')
+
+mouammel %<>%
+  rename(c("Mel_Day" = "Day.x", "LT50" = "Day.y"))
+
+head(mouammel)
+```
+
+```{r}
+Mouse_max <- max(mouammel$LT50)
+
+Mouse_axis <- Mouse_max*0.95
+
+Amoeba_max <- max(mouammel$Area)
+
+Amoeba_axis <- Amoeba_max*0.95
+
+Mel2 <- mouammel
+
+Mel2_max <- max(Mel2$Mean)
+
+Mel2_axis <- Mel2_max*0.95
+```
+
+
+```{r}
+mouammel %>%
+  ggplot(aes(Mean, LT50)) +
+  geom_point(size = 5) +
+  geom_text_repel(aes(label = Strain), size = 6) +
+  annotate("text", x = Mel2_axis - (0.1*Mel2_axis), y = Mouse_axis, 
+           label = (expression(R^{2} ~ "= 0.001178")),
+           size = 7) +
+  annotate("text", x = Mel2_axis - (0.1*Mel2_axis), y = Mouse_axis - (.1*Mouse_axis), 
+           label = "p = 0.949",
+           size = 7) +
+  xlab("Light Reflected") +
+  p +
+  ylab("Mouse LT50") +
+  theme(text = element_text(size = 30), 
+        plot.title = element_text(size = 60, face = "bold"),
+        panel.background = element_blank(),
+        panel.border = element_rect(color = "black",
+                                    fill = NA,
+                                    size = 1))
+```
+
+```{r}
+ggsave("../Figures/DD_mouse_melanin_correlation_2.png",
+       height = 7, width = 9, dpi = 150)
+```
+
+
+```{r}
+mouammel %>%
+  filter(Mel_Day == 2) %>%
+  select(c('Strain', 'Mean', 'LT50')) %>%
+  unique() %>%
+  lm(LT50~Mean, .) %>%
+  summary()
+```
+
+```{r}
+mouammel %>%
+  filter(Mel_Day == 2) %>%
+  ggplot(aes(Mean, Area)) +
+  geom_point(aes(color = Bzp_LOF), size = 3) +
+  geom_text_repel(aes(label = Strain), size = 5) +
+  annotate("text", x = Mel2_axis - (0.1*Mel2_axis), y = Amoeba_axis, 
+           label = (expression(R^{2} ~ "= 0.2611")),
+           size = 7) +
+  annotate("text", x = Mel2_axis - (0.1*Mel2_axis), y = Amoeba_axis - (.1*Amoeba_axis), 
+           label = "p = 0.241",
+           size = 7) +
+  ylab(expression("Amoeba Halo Area" ~ (cm^{2}))) +
+  xlab("Light Reflected") +
+  p +
+  theme(text = element_text(size = 30), plot.title = element_text(size = 60, face = "bold"),
+          legend.position = 'none')
+```
+
+```{r}
+ggsave("C:/Users/tsauters/Pictures/scientific figures/DD_amoeba_melanin_correlation_2.png",
+       height = 7, width = 9, dpi = 150)
+```
+
+```{r}
+mouammel %>%
+  filter(Mel_Day == 2) %>%
+  select(c('Strain', 'Mean', 'Area')) %>%
+  unique() %>%
+  lm(Area~Mean, .) %>%
+  summary()
+```
+
+```{r}
+mouammel %>%
+  filter(Mel_Day == 2) %>%
+  ggplot(aes(LT50, Area)) +
+  geom_point(size = 5) +
+  annotate("text", x = Mouse_axis - (0.2*Mouse_axis), y = Amoeba_axis, 
+           label = (expression(R^{2} ~ "= 0.01292")),
+           size = 7) +
+  annotate("text", x = Mouse_axis - (0.2*Mouse_axis), y = Amoeba_axis - (.1*Amoeba_axis), 
+           label = "p = 0.808",
+           size = 7) +
+  ylab(expression("Amoeba Halo Area" ~ (cm^{2}))) +
+  geom_text_repel(aes(label = Strain), size = 6) +
+  xlab("Mouse LT50") +
+  theme(text = element_text(size = 30),
+        plot.title = element_text(size = 60, face = "bold"),
+        panel.background = element_blank(),
+        panel.border = element_rect(color = "black",
+                                    fill = NA,
+                                    size = 1))
+```
+
+```{r}
+ggsave("../Figures/DD_amoeba_mouse_correlation.png",
+       height = 7, width = 10, dpi = 150)
+```
+
+```{r}
+mouammel %>%
+  filter(Mel_Day == 2) %>%
+  select(c('Strain', 'Area', 'LT50')) %>%
+  unique() %>%
+  lm(LT50~Area, .) %>%
+  summary()
+```
+
+```{r}
+unique(proc.mouse$Strain)
+```
+
+```{r}
+mouammel %>%
+  filter(Strain == "H99")
+```
+

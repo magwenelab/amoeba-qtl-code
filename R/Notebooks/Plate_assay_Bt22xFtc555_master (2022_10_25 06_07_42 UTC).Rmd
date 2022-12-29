@@ -1,0 +1,226 @@
+---
+title: "Plate_assay_Bt22xFtc555_master"
+author: "Thomas J. Sauters"
+date: "11/8/2019"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(magrittr)
+library(stringr)
+library(ggplot2)
+library(ggpubr)
+library(dplyr)
+library(forcats)
+library(cowplot)
+
+p <- theme(text = element_text(size = 20), plot.title = element_text(size = 30, face = "bold")) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.line = element_line(colour = "black"), plot.title = element_text(hjust = 0.5))
+
+plate <- read.csv("../Data/Plate_assay_V8_10_29_2019.csv")
+
+plate %<>% mutate(date = "10_29_2019")
+
+plate2 <- read.csv("../Data/Plate_assay_V8_10_14_2019_test.csv")
+
+plate2 %<>% mutate(date = "10_14_2019")
+
+head(plate)
+```
+
+```{r}
+master.plate <- rbind(plate, plate2)
+
+names <- as.data.frame(sub("*BF", "", master.plate[,1]))
+
+colnames(names) <- "Strains"
+
+master.plate <- cbind(names, master.plate)
+
+master.plate <- select(master.plate, -Strain)
+
+head(master.plate)
+```
+
+```{r}
+write.csv2(master.plate, file = "../Data/bt22_ftc55_original_48.csv")
+```
+
+```{r}
+dates <- sort(as.vector(unique(master.plate[['date']])))
+strains <-as.vector(unique(master.plate[['Strains']]))
+reps <- sort(as.vector(unique(master.plate[['Replicate']])))
+```
+
+```{r}
+mydata <- matrix(ncol=max(unique(master.plate$Day)) + 3, nrow=length(strains)*length(reps)*length(dates))
+
+i = 1
+
+for (s in strains) {
+  for (d in dates) {
+    for (r in reps) {
+       x <- master.plate[(master.plate$Strain == s) & (master.plate$Replicate == r) & (master.plate$date == d), c('Strains', 'Replicate', 'Day', 'Area', 'date', 'cleared')]
+       x <- x[order(x$Day),]
+       a <- x$Area - x$Area[1]
+       if (length(a) != 0) { #if there isnt data then do the thing
+       #print(length(a))
+       while (length(a) < max(unique(master.plate$Day))) {
+         #a <- c(a, NA)
+         a <- append(a, NA)
+    }
+    mydata[i,] <- c(s,d,r,a)
+   
+     i = i + 1
+       }
+  }}
+}
+
+deltadf <- data.frame(mydata)
+
+colnames(deltadf) <- c('Strain','Date', 'Rep', 1:12)
+
+
+
+head(deltadf)
+```
+
+```{r}
+frame <- deltadf %>%
+  filter(Strain != "NA") %>%
+  select_if(function(x) any(!is.na(x))) #selects for columns that have at least one data value
+
+func <- function(x) (ifelse(as.double(as.character(x)) < 0, 0, as.double(as.character(x))))
+
+inf.rm <- function(x) (ifelse(as.double(as.character(x)) == "Inf", 0, as.double(as.character(x))))
+
+deltadf.abs <- frame %>%
+  mutate_at(vars(-Rep, -Strain, -Date), func) %>%
+  mutate_at(vars(-Rep, -Strain, -Date), inf.rm)
+
+head(deltadf.abs, 43)
+```
+```{r}
+datacol <- length(deltadf.abs)- 3 #subtracting 3 represents the strain, date, and replicate columns that are removed later when transfering from a wide to a long form dataset.
+
+deltadf.long <- gather(deltadf.abs, Day, Area, 1:datacol, -Strain, -Rep, -Date)
+
+head(deltadf.long)
+```
+
+```{r}
+deltadf.long$Day = factor(deltadf.long$Day, levels = c(1:length(unique(deltadf.long$Day)))) # add levels for each day based on the number of unique days represented in the dataset
+
+ggplot(deltadf.long, aes(Day, Area, group = interaction(Strain, Rep, Date))) +
+  geom_line(aes(color=Strain), alpha=0.5, size = 1) +
+  p +
+  xlab("Days") +
+  ylab("Halo Area") +
+  ggtitle("Amoeba Spread on Bt22XFtc555 Segregants")
+```
+  
+```{r}
+ggplot(deltadf.long, aes(Day, Area, group = interaction(Strain, Rep, Date))) +
+  geom_line(color="grey", alpha=0.5, size = 1) +
+  geom_line(data = filter(deltadf.long, Strain %in% c("Bt22", "Ftc555")),
+            mapping = aes(Day, Area, group = interaction(Strain, Rep, Date), color = Strain),
+            size = 1, alpha = 0.75) +
+  p +
+  xlab("Days") +
+  ylab("Halo Area (inches)") +
+  ggtitle("Amoeba Spread on Bt22XFtc555 Segregants")
+```
+
+```{r}
+deltadf.long %>%
+  filter(Day == 12) %>%
+ggplot(aes(reorder(Strain, Area), Area)) +
+  geom_boxplot(color = "grey") +
+  geom_point(color = "grey") +
+  p +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+ggplot(deltadf.long, aes(Day, Area, group = interaction(Strain, Rep, Date))) +
+  geom_line(aes(color=Date), alpha=0.5, size = 1) +
+  p
+```
+
+
+```{r}
+deltadf.long %>%
+  group_by(Strain) %>%
+  sample_n(18) %>%
+  ggplot(aes(Day, Area, group=interaction(Strain, Rep, Date))) + 
+  geom_line(aes(color = Rep)) +
+  facet_wrap(~Strain, ncol = 4) +
+  p
+```
+```{r}
+deltadf.long %>%
+  filter(Strain == "Kn99" | Strain == "Bt22" | Strain == "Ftc555") %>%
+ggplot(aes(Strain, Area)) +
+  geom_col(aes(color = Day, fill = Day), position = "dodge") +
+  facet_wrap(~Rep) +
+  p +
+  xlab("Strain") +
+  ylab("Halo Area")
+```
+
+```{r}
+deltadf.des <- deltadf.abs[,-1:-3]
+
+deltadf.sum <- rowSums(deltadf.des, na.rm = TRUE)
+
+deltadf.int <- deltadf.sum*24
+
+head(deltadf.int)
+```
+
+```{r}
+deltadf.int.add <- cbind(deltadf.abs[,1:3], as.data.frame(deltadf.int))
+
+head(deltadf.int.add)
+```
+
+```{r}
+ggplot(deltadf.int.add, aes(reorder(Strain, -deltadf.int), deltadf.int)) +
+  geom_boxplot(aes(color = Strain)) +
+  geom_jitter(aes(color = Strain)) +
+  p +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+  
+```{r}
+deltadf.parents <- deltadf.int.add %>%
+  filter(Strain == "Bt22" | Strain == "Ftc555")
+
+title <- expression(paste("Amoeba Growth on ", italic("C.neoformans "), "Bt22xFtc555-1 Segregants"))
+
+ggplot(deltadf.int.add, aes(reorder(Strain, deltadf.int), deltadf.int)) +
+  geom_boxplot(color = "grey") +
+  geom_boxplot(data = deltadf.parents, mapping = aes(reorder(Strain, -deltadf.int), deltadf.int, color = Strain)) +
+  p +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  xlab("Strain") +
+  ylab("Total Halo Growth") +
+  ggtitle(title)
+```
+
+```{r}
+deltadf.parents <- deltadf.int.add %>%
+  filter(Strain == "Bt22" | Strain == "Ftc555")
+
+title <- expression(paste("Amoeba Growth on Bt22xFtc555-1 Segregants"))
+
+ggplot(deltadf.int.add, aes(reorder(Strain, deltadf.int), deltadf.int)) +
+  geom_boxplot(color = "grey") +
+  geom_boxplot(data = deltadf.parents, mapping = aes(reorder(Strain, -deltadf.int), deltadf.int, color = Strain)) +
+  p +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  xlab("Strain") +
+  ylab("Total Halo Growth") +
+  ggtitle(title)
+```

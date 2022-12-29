@@ -1,0 +1,283 @@
+---
+title: "Untitled"
+author: "Thomas J. Sauters"
+date: "2022-08-05"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(magrittr)
+library(stringr)
+library(ggplot2)
+#library(ggpubr)
+library(dplyr)
+library(forcats)
+library(cowplot)
+library(broom)
+library(ggbeeswarm)
+library(data.table)
+library(GGally)
+library(conover.test)
+
+
+p <- theme(text = element_text(size = 20), plot.title = element_text(size = 30, face = "bold")) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.line = element_line(colour = "black"), plot.title = element_text(hjust = 0.5))
+
+plates <- read.csv("../Data/F9_Bt_45_amoeba_7_19_2022.csv")
+```
+
+```{r}
+plates %<>% dplyr::select(-Mean, -Min, -Max)
+
+head(plates)
+```
+
+```{r}
+wide.boi <- plates %>%
+  filter(is.na(Issues)) %>%
+  dplyr::select(-Issues) %>%
+  arrange(Strain, Day) %>%
+  unite("Strain", c("Strain", "Replicate", "Passage", "Date"), sep = "&") %>%
+  reshape(idvar = "Strain", timevar = "Day", direction = "wide") %>%
+  separate("Strain", c("Strain", "Replicate", "Passage", "Date"), sep = "&")
+
+#wide.boi <- na.omit(wide.boi)
+
+remove <- function(x, na.rm = TRUE) (
+  x - wide.boi$`Area.1`
+)
+
+removed.df <- wide.boi %>% mutate_at(c("Area.12", "Area.18"), remove)
+
+#removed.df[, c(7)] <- sapply(removed.df[, c(7)], as.numeric)
+
+removed.df <- removed.df %>% 
+  mutate(Area.12 = (sqrt(Area.12)*2.54)^2,
+         Area.18 = (sqrt(Area.18)*2.54)^2) %>%
+  mutate(Area.1 = (sqrt(Area.1)*2.54)^2) %>%
+  filter(!is.na(Area.18) & !is.na(Area.12) & !is.na(Area.1))
+
+head(removed.df)
+```
+
+```{r}
+removed.12.aov <- aov(Area.12 ~ Strain, data = removed.df)
+
+summary(removed.12.aov)
+```
+
+```{r}
+TukeyHSD(removed.12.aov)
+```
+
+```{r}
+removed.18.aov <- aov(Area.18 ~ Strain, data = removed.df)
+
+summary(removed.18.aov)
+```
+
+```{r}
+TukeyHSD(removed.18.aov)
+```
+
+```{r}
+removed.df %>%
+  group_by(Strain) %>%
+  summarise(`W Stat` = shapiro.test(Area.18)$statistic,
+            p.value = shapiro.test(Area.18)$p.value)
+```
+```{r}
+head(removed.df)
+```
+
+```{r}
+kruskal.test(Area.18 ~ Strain, data = removed.df)
+```
+
+```{r}
+pairwise.wilcox.test(removed.df$Area.18, removed.df$Strain, p.adjust.method = "bonferroni")
+```
+
+```{r}
+conover.test(removed.df$Area.18, removed.df$Strain, method = "bonferroni")
+```
+```{r}
+conover.test(removed.df$Area.12, removed.df$Strain, method = "bonferroni")
+```
+
+```{r}
+#write.csv(removed.df, "../Data/Amoeba_7_5_2022.csv")
+```
+
+
+```{r}
+sub.df <- filter(removed.df, Strain %in% c("Bt22", "Ftc555-1"))
+wilcox.test(Area.18 ~ Strain, sub.df)
+```
+
+```{r}
+removed.df %>%
+  ggplot(aes(Area.18)) +
+  geom_histogram() +
+  p
+```
+
+```{r}
+data_summary <- function(data, varname, groupnames){
+  require(plyr)
+  summary_func <- function(x, col){
+    c(mean = mean(x[[col]], na.rm=TRUE),
+      sd = sd(x[[col]], na.rm=TRUE))
+  }
+  data_sum<-ddply(data, groupnames, .fun=summary_func,
+                  varname)
+  data_sum <- rename(data_sum, c("mean" = varname))
+ return(data_sum)
+}
+```
+
+```{r}
+removed.12.sd <- data_summary(removed.df, varname = "Area.12", groupnames = c("Strain"))
+
+head(removed.12.sd)
+```
+
+```{r}
+removed.18.sd <- data_summary(removed.df, varname = "Area.18", groupnames = c("Strain"))
+
+head(removed.18.sd)
+```
+
+```{r}
+removed.12.sd %>%
+  ggplot(aes(Strain, Area.12)) +
+  geom_col(size = 1,color = "Black", fill = "white", position=position_dodge()) +
+  geom_errorbar(aes(ymin=Area.12-sd, ymax=Area.12+sd), 
+                width=.2, size = 1) +
+  p
+```
+
+```{r}
+removed.df %>%
+  ggplot(aes(Strain, Area.18)) +
+  geom_boxplot() +
+  geom_beeswarm() +
+  p
+```
+
+```{r}
+removed.18.sd
+```
+
+```{r}
+removed.18.sd$Strain <- factor(removed.18.sd$Strain, levels = c("Ftc555-1", "F9", "Bt22", "Bt45", "Bt103", "Bt75"))
+
+removed.18.sd %>%
+  ggplot(aes(Strain, Area.18)) +
+  geom_col(aes(fill = Strain), size = 1, color = "Black",
+           position = position_dodge(), width = 0.75) +
+  geom_errorbar(aes(ymin=Area.18-sd, ymax=Area.18+sd), 
+                width=.2, size = 1) +
+  coord_fixed(.1) +
+  theme(
+        legend.position="none") +
+  scale_x_discrete(labels = c("Ftc555-1" = expression(paste("Ftc555-1", bold("a"))),
+                              "Bt22"= expression(paste("Bt22", alpha)),
+                              "F9" = expression(paste("Ftc555-1", bold("a"), italic(" bzp4::NAT"))),
+                              "Bt45" = expression(paste("Bt45", alpha)),
+                              "Bt103" = paste("Bt103"),
+                              "Bt75" = paste("Bt75"))) +
+  xlab("Strain") +
+  ylab(expression("Amoeba Halo Area" ~ (cm^{2}))) +
+  scale_fill_manual(values = c('Bt22' = "dodgerblue3", 'Ftc555-1' = "chocolate1", 'Bt45' = "dodgerblue4", 'F9' = "chocolate3", 'Bt103' = 'dodgerblue4', 'Bt75' = 'dodgerblue4'), guide = "none") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  p
+
+ggsave("Ftc_KO_bt45_comparison.png", path = "C:/Users/tsauters/Pictures/scientific figures/",
+       height = 7, width = 12)
+```
+
+
+```{r}
+removed.18.sd %>%
+  filter(Strain %in% c("Bt22", "Ftc555-1", "F9", "Bt45")) %>%
+  ggplot(aes(Strain, Area.18)) +
+  geom_col(aes(fill = Strain), size = 1, color = "Black",
+           position = position_dodge(), width = 0.75) +
+  geom_errorbar(aes(ymin=Area.18-sd, ymax=Area.18+sd), 
+                width=.2, size = 1) +
+  coord_fixed(.1) +
+  theme(
+        legend.position="none") +
+  scale_x_discrete(labels = c("Ftc555-1" = expression(paste("Ftc555-1", bold("a"))),
+                              "Bt22"= expression(paste("Bt22", alpha)),
+                              "F9" = expression(paste("Ftc555-1", bold("a"), italic(" bzp4::NAT"))),
+                              "Bt45" = expression(paste("Bt45", alpha)),
+                              "Bt103" = paste("Bt103"),
+                              "Bt75" = paste("Bt75"))) +
+  xlab("Strain") +
+  ylab(expression("Amoeba Halo Area" ~ (cm^{2}))) +
+  scale_fill_manual(values = c('Bt22' = "dodgerblue3", 'Ftc555-1' = "chocolate1", 'Bt45' = "dodgerblue4", 'F9' = "chocolate3", 'Bt103' = 'dodgerblue4', 'Bt75' = 'dodgerblue4'), guide = "none") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  p
+
+ggsave("Ftc_KO_bt45_comparison_limited.png", path = "../Figures/",
+       height = 7, width = 12)
+```
+
+```{r}
+removed.df %>%
+  select(Strain, Area.18, Replicate) %>%
+  filter(Strain %in% c("Bt22", "Ftc555-1")) %>%
+  aov(Area.18 ~ Strain, data = .) %>%
+  summary()
+```
+
+```{r}
+removed.df %>%
+  select(Strain, Area.18, Replicate) %>%
+  filter(Strain %in% c("Bt45", "Ftc555-1")) %>%
+  aov(Area.18 ~ Strain, data = .) %>%
+  summary()
+```
+
+```{r}
+removed.df %>%
+  select(Strain, Area.18, Replicate) %>%
+  filter(Strain %in% c("F9", "Ftc555-1")) %>%
+  aov(Area.18 ~ Strain, data = .) %>%
+  summary()
+```
+
+```{r}
+removed.df %>%
+  select(Strain, Area.18, Replicate) %>%
+  filter(Strain %in% c("Bt45", "Bt22")) %>%
+  aov(Area.18 ~ Strain, data = .) %>%
+  summary()
+```
+
+```{r}
+removed.df %>%
+  select(Strain, Area.18, Replicate) %>%
+  filter(Strain %in% c("Bt22", "F9")) %>%
+  aov(Area.18 ~ Strain, data = .) %>%
+  summary()
+```
+
+```{r}
+removed.df %>%
+  select(Strain, Area.18, Replicate) %>%
+  filter(Strain %in% c("Bt22", "Bt75")) %>%
+  aov(Area.18 ~ Strain, data = .) %>%
+  summary()
+```
+
+```{r}
+removed.df %>%
+  select(Strain, Area.18, Replicate) %>%
+  filter(Strain %in% c("Bt45", "Bt75")) %>%
+  aov(Area.18 ~ Strain, data = .) %>%
+  summary()
+```

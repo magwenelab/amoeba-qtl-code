@@ -1,0 +1,732 @@
+---
+title: "Plate_assay_Bt22_Ftc555_major_run"
+author: "Thomas J. Sauters"
+date: "3/11/2020"
+output: html_document
+---
+```{r}
+library(tidyverse)
+library(magrittr)
+library(stringr)
+library(ggplot2)
+library(ggpubr)
+library(dplyr)
+library(forcats)
+library(cowplot)
+library(GGally)
+library(broom)
+
+p <- theme(text = element_text(size = 20), plot.title = element_text(size = 30, face = "bold")) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.line = element_line(colour = "black"), plot.title = element_text(hjust = 0.5))
+
+plate <- read.csv("../Data/Plate_assay_V8_BF_Cross_3_2_2020.csv")
+```
+
+```{r}
+plates <- select(plate, -Mean, -Min, -Max, -X)
+
+head(plates)
+```
+
+
+```{r}
+wide.boi <- plates %>%
+  filter(issues != "yes") %>%
+  select(-issues) %>%
+  arrange(group, run) %>%
+  unite("Strain", c("Strain", "Replicate", "group", "run", "stack_position", "stack", "passage", "stack_size")) %>%
+  reshape(idvar = "Strain", timevar = "Day", direction = "wide") %>%
+  separate("Strain", c("Strain", "Replicate", "group", "run", "stack_position", "stack", "passage", "stack_size"))
+
+remove <- function(x, na.rm = FALSE) (
+  x - wide.boi$`Area.1`
+)
+
+removed.boi <- wide.boi %>% mutate_at(c("Area.12"), remove)
+
+removed.boi[, c(7)] <- sapply(removed.boi[, c(7)], as.numeric)
+
+removed.boi <- removed.boi %>% 
+  mutate(Area.12 = (sqrt(Area.12)*2.54)^2) %>%
+  mutate(Area.1 = (sqrt(Area.12)*2.54)^2)
+
+head(removed.boi)
+
+#View(wide.boi)
+```
+
+```{r}
+#write.csv(removed.boi, "C:\\Users\\tsauters\\Documents\\Bt22xFtc555-1_amoeba_data.csv")
+```
+
+```{r}
+noseq <- removed.boi %>%
+  filter(Area.12 < 0)
+
+head(noseq)
+```
+
+
+```{r}
+ranked.boi <- removed.boi %>%
+  filter(Area.12 != 'NA') %>%
+  filter(Strain != "235") %>% #filtering against something doesnt want to work with the | symbol for some goddamn reason
+  group_by(Replicate) %>%
+  mutate(ranked = rank(Area.12)) %>%
+  select(-stack_position, -Area.1, -Area.12) %>%
+  spread(Replicate, ranked) %>%
+  gather(Replicate, ranked, c('1', '2', '3')) %>%
+#  rename(one = '1', two = '2', three = '3') %>%
+#  mutate(avg.rank = (one + two + three)/3) %>%
+  filter(ranked != 'NA')
+
+head(ranked.boi)
+```
+```{r}
+ranked.parents <- ranked.boi %>%
+  filter(Strain == "Bt22" | Strain == "Ftc555")
+
+ggplot(ranked.boi, aes(reorder(Strain, ranked), ranked)) +
+#  geom_boxplot() +
+  geom_point(color = 'gray70', size = 2) +
+  geom_point(data = ranked.parents, aes(reorder(Strain, ranked), ranked, color = Strain), size = 3) +
+  p +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  xlab("Strains") +
+  ylab("Rank") +
+  ggtitle("Rank Order of Ftc555-1xBt22") +
+  facet_wrap(~Replicate) +
+  theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+```
+
+```{r}
+ranked.parents <- ranked.boi %>%
+  filter(Strain == "Bt22" | Strain == "Ftc555")
+
+ggplot(ranked.boi, aes(reorder(Strain, ranked), ranked)) +
+#  geom_boxplot() +
+  geom_point(color = 'gray70', size = 2) +
+  geom_point(data = ranked.parents, aes(reorder(Strain, ranked), ranked, color = Strain), size = 3) +
+  p +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  xlab("Strains") +
+  ylab("Rank") +
+  ggtitle("Rank Order of Ftc555-1xBt22") +
+  theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+```
+
+```{r}
+ranked.parents <- ranked.boi %>%
+  filter(Strain == "Bt22" | Strain == "Ftc555")
+
+ggplot(ranked.boi, aes(reorder(Strain, ranked), ranked)) +
+#  geom_boxplot() +
+  geom_point(color = 'gray70', size = 2) +
+  geom_point(data = ranked.parents, aes(reorder(Strain, ranked), ranked, color = Strain), size = 3) +
+  p +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  xlab("Strains") +
+  ylab("Rank") +
+  ggtitle("Rank Order of Ftc555-1xBt22") +
+  facet_wrap(~group + run) +
+  theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+```
+```{r}
+head(ranked.parents)
+```
+
+
+```{r}
+test <- ranked.parents %>%
+  group_by(Strain) %>%
+  mutate(Overall_average = mean(ranked)) %>%
+  group_by(Strain, group, run) %>%
+  mutate(Plate_average = mean(ranked), Plate_sd = sd(ranked)) %>%
+  mutate()
+
+head(test)
+```
+```{r}
+ggplot(test, aes(Strain, ranked)) +
+  geom_boxplot(aes(color = Strain)) +
+  geom_point(data = test, aes(Strain, Overall_average), size = 2, alpha = 0.7, color = "black") +
+#  geom_point(data = test, aes(Strain, Plate_average), size = 3, alpha = 0.7, color = "orange") +
+  p +
+  facet_wrap(~group + run) +
+  ylab("Rank")
+```
+
+```{r}
+ggplot(test, aes(Strain, Plate_average)) +
+  geom_point(size = 3, alpha = 0.2, color = "goldenrod") +
+  theme(legend.text = element_blank()) +
+  geom_point(data = test, aes(Strain, Overall_average), size = 3, alpha = 0.2) +
+  geom_point(data = test, aes(Strain, Plate_average+Plate_sd), size = 3, alpha = 0.2, color = "Orange") +
+  geom_point(data = test, aes(Strain, Plate_average-Plate_sd), size = 3, alpha = 0.2, color = "cyan") +
+  p +
+  facet_wrap(~group + run)
+```
+
+```{r}
+interm <- ranked.boi[c(1, 2, 4, 5, 6, 7, 8)]
+
+rep.ranked.boi <- interm %>%
+  filter(Replicate != 'NA') %>%
+#  select(Strain, Replicate, ranked) %>%
+#  filter(Strain != "Bt22") %>%
+#  filter(Strain != "KN99") %>%
+#  filter(Strain != "Ftc555") %>%
+  spread(Replicate, ranked) %>%
+  select(-group, -stack, -passage, -stack_size) %>%
+  rename('one' = '1', 'two' = '2', 'three' = '3')
+#  reshape(idvar = "Strain", timevar = "Replicate", direction = "wide")
+
+head(rep.ranked.boi)
+```
+
+```{r}
+fit.rep.ranked.boi <- lm(one ~ two + three, rep.ranked.boi)
+
+summary(fit.rep.ranked.boi)
+```
+
+```{r}
+reped.ranked.boi <- select(rep.ranked.boi, -Strain)
+
+ggpairs(reped.ranked.boi)
+```
+
+```{r}
+ggsave("../Figures/bt22xftc555-1_rank_cor.png",
+       height = 7, width = 9, dpi = 150)
+```
+
+```{r}
+head(removed.boi)
+```
+
+
+```{r}
+rep.removed.boi <- removed.boi %>%
+  select(Strain, Area.12, Replicate) %>%
+  filter((Replicate != 'NA') & (Area.12 != 'NA')) %>%
+  group_by(Strain, Replicate) %>%
+  mutate("Area" = mean(Area.12)) %>%
+  select(-Area.12) %>%
+  unique() %>%
+  spread(Replicate, Area) %>%
+  ungroup()
+
+
+rep.removed.boi
+```
+
+```{r}
+rep.removed.boi <- select(rep.removed.boi, -Strain)
+
+ggpairs(rep.removed.boi)
+```
+
+```{r}
+ggsave("../Figures/bt22xftc555-1_cor.png",
+       height = 7, width = 9, dpi = 150)
+```
+
+
+```{r}
+avg.ranked.boi <- removed.boi %>%
+  filter(Area.12 != 'NA') %>%
+  filter(Strain != "235") %>% #filtering against something doesnt want to work with the | symbol for some goddamn reason
+  group_by(run, Replicate) %>%
+  mutate(ranked = rank(Area.12)) %>%
+  select(-stack_position, -Area.1, -Area.12) %>%
+  spread(Replicate, ranked) %>%
+  rename(one = '1', two = '2', three = '3') %>%
+  mutate(avg.rank = (one + two + three)/3) %>%
+  filter(avg.rank != 'NA') %>%
+  gather(Replicate, ranked, c('one', 'two', 'three'))
+
+head(avg.ranked.boi)
+```
+```{r}
+avg.ranked.parents <- avg.ranked.boi %>%
+  filter(Strain == "KN99" | Strain == "Bt22" | Strain == "Ftc555")
+
+ggplot(avg.ranked.boi, aes(reorder(Strain, avg.rank), ranked)) +
+#  geom_boxplot() +
+  geom_point(color = 'gray70', size = 2) +
+  geom_point(data = avg.ranked.parents, aes(reorder(Strain, avg.rank), ranked, color = Strain), size = 3) +
+  p +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  xlab("Strains") +
+  ylab("Rank") +
+  ggtitle("Rank Order of Strains") +
+  facet_wrap(~Replicate) +
+  theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+
+```
+
+```{r}
+avg.ranked.parents <- avg.ranked.boi %>%
+  filter(Strain == "KN99" | Strain == "Bt22" | Strain == "Ftc555")
+
+ggplot(avg.ranked.boi, aes(reorder(Strain, avg.rank), avg.rank)) +
+  geom_point(color = 'gray70') +
+  geom_point(data = avg.ranked.parents, aes(reorder(Strain, avg.rank), avg.rank, color = Strain)) +
+  p +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  xlab("Strains") +
+  ylab("Average Rank") +
+  ggtitle("Average Rank Order of Strains") +
+  theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+```
+```{r}
+ggplot(avg.ranked.boi, aes(ranked)) +
+  geom_histogram(bins = 65) +
+  p
+
+ggplot(avg.ranked.boi, aes(avg.rank)) +
+  geom_histogram(bins = 35) +
+  p
+```
+
+
+```{r}
+removed.boi %>%
+  filter(Strain == "Bt22" | Strain == "KN99" | Strain == "Ftc555") %>%
+ggplot(aes(Strain, Area.12)) +
+  geom_boxplot(aes(color = run)) +
+  geom_jitter(aes(color = Replicate), size = 2) +
+  p +
+  facet_wrap(~group)
+
+removed.boi %>%
+  filter(Strain == "Bt22" | Strain == "KN99" | Strain == "Ftc555") %>%
+ggplot(aes(Strain, Area.12)) +
+  geom_violin() +
+  geom_jitter(aes(color = Replicate), size = 2, width = .1, alpha = .5) +
+  p+
+  facet_wrap(~group)
+
+removed.boi %>%
+  filter(Strain == "Bt22" | Strain == "KN99" | Strain == "Ftc555") %>%
+ggplot(aes(group, Area.12)) +
+  geom_violin(aes(fill = Strain), alpha = .5) +
+  geom_jitter(alpha = .5, width = .2) +
+  p +
+  theme(legend.position = "none")
+
+removed.boi %>%
+  filter(Strain == "Bt22" | Strain == "KN99" | Strain == "Ftc555") %>%
+ggplot(aes(Replicate, Area.12)) +
+  geom_violin(aes(fill = Strain), alpha = .5) +
+  geom_jitter(alpha = .5, width = .2) +
+  p +
+  theme(legend.position = "none")
+```
+```{r}
+removed.boi %>%
+  filter(Strain == "Bt22" | Strain == "KN99" | Strain == "Ftc555") %>%
+ggplot(aes(Strain, sqrt(Area.12))) +
+  geom_jitter(aes(color = Replicate), alpha = .75, width = .1, size = 2) +
+  p +
+  facet_wrap(~interaction(group, run)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+removed.boi %>%
+  select(group, passage) %>%
+  group_by(group) %>%
+  unique()
+```
+
+
+```{r}
+removed.boi %>%
+  filter(Strain == "Bt22" | Strain == "KN99" | Strain == "Ftc555") %>%
+ggplot(aes(Strain, Area.12, group = interaction(Replicate, Strain))) +
+  geom_boxplot(aes(color = Replicate)) +
+  geom_jitter() +
+  p
+
+removed.boi %>%
+  filter(Strain == "Bt22" | Strain == "KN99" | Strain == "Ftc555") %>%
+ggplot(aes(Strain, Area.1, group = interaction(Replicate, Strain))) +
+  geom_boxplot(aes(color = Replicate)) +
+  geom_jitter() +
+  p
+```
+
+```{r}
+removed.boi %>%
+  ggplot(aes(Area.12)) +
+  geom_histogram(position = "dodge", bins = 90) +
+  p +
+  xlab("Area (cm^2)") +
+  ggtitle("Histogram of Halo Areas")
+
+removed.boi %>%
+  ggplot(aes(Area.12)) +
+  geom_density(position = "dodge") +
+  p 
+```
+
+```{r}
+removed.boi %>%
+  ggplot(aes(Area.12)) +
+  geom_density(aes(fill = group), alpha = .5) +
+  p +
+  xlab("Area") +
+  ggtitle("Density by Group")+
+  facet_wrap(~group)
+
+removed.boi %>%
+  ggplot(aes(Area.12)) +
+  geom_density(aes(fill = group), alpha = .5) +
+  p +
+  xlab("Area") +
+  ggtitle("Density by Group-Run Interaction") +
+  facet_wrap(~interaction(group, run))
+
+removed.boi %>%
+  ggplot(aes(Area.12)) +
+  geom_density(aes(fill = as.character(passage)), alpha = .5) +
+  p +
+  xlab("Area") +
+  ggtitle("Density by Passage Number") +
+  labs(color = 'Passage #')
+
+removed.boi %>%
+  ggplot(aes(Area.12)) +
+  geom_density(aes(fill = as.character(passage)), alpha = .5) +
+  p +
+  xlab("Area") +
+  ggtitle("Density by Passage Number") +
+  labs(color = 'Passage #') +
+  facet_wrap(~passage)
+```
+
+```{r}
+removed.boi %>%
+  ggplot(aes(group, Area.12)) +
+  geom_violin(aes(fill = group), alpha = .5) +
+  geom_jitter(alpha = .5, width = .2) +
+  p +
+  theme(legend.position = "none") +
+  xlab("Group") +
+  ylab("Area") +
+  ggtitle("Comparison of Experimental Groups")
+  
+removed.boi %>%
+  ggplot(aes(reorder(as.character(passage), passage), Area.12)) +
+  geom_violin(aes(fill = as.character(passage)), alpha = .5) +
+  geom_jitter(alpha = .5, width = .2) +
+  p +
+  theme(legend.position = "none") +
+  xlab("Passage") +
+  ylab("Area") +
+  ggtitle("Comparison by Passage Number")
+
+removed.boi %>%
+  ggplot(aes(reorder(stack_position, as.numeric(stack_position)), Area.12)) +
+  geom_violin(aes(fill = as.character(stack_position)), alpha = .5) +
+  geom_jitter(alpha = .5, width = .2) +
+  p +
+  theme(legend.position = "none") +
+  xlab("Stack Position") +
+  ylab("Area") +
+  ggtitle("Comparison by Stack Position")
+
+removed.boi %>%
+  ggplot(aes(as.character(Replicate), Area.12)) +
+  geom_violin(aes(fill = Replicate), alpha = .5) +
+  geom_jitter(alpha = .5, width = .2) +
+  p +
+  theme(legend.position = "none") +
+  xlab("Replicate") +
+  ylab("Area") +
+  ggtitle("Comparison by Replicate Number")
+
+removed.boi %>%
+  ggplot(aes(as.character(run), Area.12)) +
+  geom_violin(aes(fill = run), alpha = .5) +
+  geom_jitter(alpha = .5, width = .2) +
+  p +
+  theme(legend.position = "none") +
+  xlab("Replicate") +
+  ylab("Area") +
+  ggtitle("Comparison by Run") +
+  facet_wrap(~group)
+```
+
+```{r}
+removed.boi %>%
+  ggplot(aes(reorder(group, group), Area.12)) +
+  geom_violin() +
+  geom_jitter(aes(color = run), alpha = .75, width = .2, size = 2) +
+  p +
+#  theme(legend.position = "none") +
+  xlab("Stack Position") +
+  ylab("Area")
+```
+
+
+```{r}
+removed.boi %>%
+  ggplot(aes(Area.12, Area.1)) +
+  geom_point(aes(color = Strain)) +
+  p +
+  theme(legend.position = "none")
+```
+
+```{r}
+parents <- removed.boi %>%
+  filter(Strain == "Kn99" | Strain == "Bt22" | Strain == "Ftc555")
+
+removed.boi %>%
+  filter(Area.12 != 'NA') %>%
+ggplot(aes(reorder(Strain, Area.12), Area.12)) +
+  geom_boxplot(color = "grey") +
+  geom_point(color = "grey", size = 2) +
+  geom_boxplot(data = parents, mapping = aes(reorder(Strain, Area.12), Area.12, color = Strain)) +
+  geom_point(data = parents, mapping = aes(reorder(Strain, Area.12), Area.12, color = Strain)) +
+  p +
+  xlab("Strains") +
+  ylab("Area cm^2") +
+  ggtitle("Halo Area of Ftc555-1xBt22 by Strain") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+removed.boi %>%
+ggplot(aes(reorder(Strain, Area.12), Area.12)) +
+  geom_boxplot() +
+  geom_point(aes(color = Replicate), size = 2) +
+  p+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+removed.boi %>%
+ggplot(aes(reorder(Strain, Area.1), Area.1)) +
+  geom_boxplot() +
+  geom_point(aes(color = Replicate), size = 2) +
+  p+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+removed.boi %>%
+ggplot(aes(reorder(Strain, Area.1), Area.12)) +
+  geom_boxplot() +
+  geom_point(aes(color = Replicate), size = 2) +
+  p+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+removed.boi %>%
+ggplot(aes(reorder(Strain, Area.12), Area.1)) +
+  geom_boxplot() +
+  geom_point(aes(color = Replicate), size = 2) +
+  p+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+removed.boi %>%
+ggplot(aes(Strain, Area.12)) +
+  geom_point(aes(color = Replicate), size = 2) +
+  p+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  xlab("Strain") +
+  ylab("Final Area") +
+  theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+```
+
+
+```{r}
+removed.boi %>%
+  filter(Area.12 != 'NA') %>%
+ggplot(aes(reorder(Strain, Area.12), Area.12)) +
+  geom_point(color = 'gray70', size = 2) +
+  geom_point(data = parents, aes(reorder(Strain, Area.12), Area.12, color = Strain), size = 3) +
+  p +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  xlab("Strains") +
+  ylab("Area") +
+  ggtitle("Area of Ftc555-1xBt22") +
+  facet_wrap(~Replicate) +
+  theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+```
+
+```{r}
+test.mean <- removed.boi %>%
+  group_by(Strain) %>%
+  mutate(Mean = mean(Area.12))
+
+head(test.mean)
+```
+
+```{r}
+kruskal.test(Area.12 ~ Replicate, data = test.mean)
+```
+
+
+```{r}
+test.mean %>%
+  filter(Area.12 != 'NA') %>%
+  filter(Mean != 'NA') %>%
+ggplot(aes(reorder(Strain, Mean), Area.12)) +
+  geom_point(aes(color = Replicate), size = 2) +
+  facet_wrap(~Replicate) +
+  p +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+test.mean %>%
+  filter(Area.12 != 'NA') %>%
+  filter(Mean != 'NA') %>%
+ggplot(aes(reorder(Strain, Area.12), Area.12)) +
+  geom_point(aes(color = Replicate), size = 2) +
+  facet_wrap(~Replicate) +
+  p +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+```{r}
+mean.boi <- aggregate(Area.12 ~ Strain, data = removed.boi, FUN = mean)
+
+mean.boi <- rename(mean.boi, Mean_Area = Area.12, Strains = Strain)
+
+sd.boi <- aggregate(Area.12 ~ Strain, data = removed.boi, FUN = sd)
+
+sd.boi <- rename(sd.boi, SD_Area = Area.12)
+
+sdmean.boi <- cbind(sd.boi, mean.boi)
+
+sdmean.boi <- select(sdmean.boi, -Strains)
+
+head(sdmean.boi)
+```
+
+
+```{r}
+sdmean.parents <- sdmean.boi %>%
+  filter(Strain == "KN99" | Strain == "Bt22" | Strain == "Ftc555")
+
+ggplot(sdmean.boi, aes(Mean_Area)) +
+  geom_histogram(bins = 25) +
+  p +
+  xlab("Mean Area")
+
+ggplot(sdmean.boi, aes(SD_Area^2)) +
+  geom_histogram(bins = 20) +
+  p +
+  xlab("Variance")
+
+ggplot(sdmean.boi, aes(Mean_Area, SD_Area^2)) +
+  geom_point() +
+  p +
+  geom_point(data = sdmean.parents, mapping = aes(Mean_Area, SD_Area^2, color = Strain), size = 2) +
+  xlab("Mean Area") +
+  ylab("Variance") +
+  ggtitle("Variance by Averaged Halo Area")
+```
+
+
+```{r}
+highvar <- sdmean.boi %>%
+  mutate(sdsubmean = SD_Area/Mean_Area)
+
+head(highvar)
+```
+
+```{r}
+noseq2 <- highvar %>%
+  filter(sdsubmean > 1)
+
+head(noseq2)
+```
+
+
+
+```{r}
+rep.boi <- removed.boi %>%
+  select(Strain, Replicate, Area.12) %>%
+  reshape(idvar = "Strain", timevar = "Replicate", direction = "wide") %>%
+  filter(Area.12.3 != "NA" | Area.12.2 != "NA"| Area.12.1 != "NA")
+
+head(rep.boi)
+```
+
+```{r}
+fit.rep.boi <- lm(Area.12.1 ~ Area.12.2 + Area.12.3, rep.boi)
+
+summary(fit.rep.boi)
+```
+
+```{r}
+reped.boi <- select(rep.boi, -Strain)
+
+ggpairs(reped.boi)
+```
+```{r}
+head(rep.boi)
+```
+
+```{r}
+cor.rep <- rep.boi %>%
+  filter(Area.12.3 != "NA") %>%
+  filter(Area.12.1 != "NA") %>%
+  filter(Area.12.2 != "NA")
+
+cor(cor.rep$Area.12.1, cor.rep$Area.12.2, method = "spearman")
+```
+
+#```{r}
+q <- scatterplot3d(reped.boi, pch = 16,  angle = 50, highlight.3d = TRUE, type = "h",  main = "Halo Area as a Function of Replicate")
+
+q$plane3d(fit.rep.boi, col = "slateblue2")
+#```
+
+```{r}
+reped.boi.aug <- augment(fit.rep.boi, reped.boi)
+
+ggplot(reped.boi.aug, aes(x = Area.12.1, y = .resid)) +
+  geom_point() +
+  geom_hline(yintercept = 0, color = 'firebrick', linetype = 'dashed') +
+  labs(x = "rep 1", y = "Residuals") +
+  p
+
+ggplot(reped.boi.aug, aes(x = Area.12.2, y = .resid)) +
+  geom_point() +
+  geom_hline(yintercept = 0, color = 'firebrick', linetype = 'dashed') +
+  labs(x = "rep 2", y = "Residuals") +
+  p
+
+ggplot(reped.boi.aug, aes(x = Area.12.3, y = .resid)) +
+  geom_point() +
+  geom_hline(yintercept = 0, color = 'firebrick', linetype = 'dashed') +
+  labs(x = "rep 3", y = "Residuals") +
+  p
+```
+
+```{r}
+shapiro.test(reped.boi.aug$.resid)
+
+ggplot(reped.boi.aug, aes(sample = .std.resid)) +
+  geom_qq() +
+  geom_qq_line(color = "red") +
+  p
+```
+
+```{r}
+removed.boi
+```
+
+```{r}
+controls <- c("KN99", "Kn99", "Bt22", "Ftc555")
+
+Parentals <- removed.boi %>%
+  filter(Strain %in% controls)
+
+Parentals
+```
+
+```{r}
+write_csv(Parentals, "../Data/bt22xftc555_amoeba_parents.csv")
+```
