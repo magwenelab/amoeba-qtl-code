@@ -1,0 +1,14 @@
+,Seqid,Pos,Chrom,Gene,Description,Strand,PMY2649,PMY2650,PMY2559,Ref,Alt
+61934,CP003827.1,706215,8,CNAG_03346,bZip transcription factor  putative,-1.0,1.0,1.0,1.0,C,C.T
+61991,CP003827.1,706328,8,CNAG_03346,bZip transcription factor  putative,-1.0,0.0,0.0,0.0,C,C.A.T
+62272,CP003827.1,706844,8,CNAG_03346,bZip transcription factor  putative,-1.0,1.0,1.0,2.0,TCGGGAGA,TCGGGAGA.TCGGAAGA.TAGGAAGA.TCGGTAGT.ACGGAAGA.TCTGAAGA
+62370,CP003827.1,707068,8,CNAG_03346,bZip transcription factor  putative,-1.0,1.0,1.0,1.0,GGG,GGG.GGA
+62444,CP003827.1,707233,8,CNAG_03346,bZip transcription factor  putative,-1.0,1.0,1.0,1.0,TCGCCT,TCGCCT.TCGCTT
+62541,CP003827.1,707385,8,CNAG_03346,bZip transcription factor  putative,-1.0,0.0,0.0,0.0,T,T.G
+62560,CP003827.1,707415,8,CNAG_03346,bZip transcription factor  putative,-1.0,2.0,0.0,0.0,T,T.C.G
+62582,CP003827.1,707466,8,CNAG_03346,bZip transcription factor  putative,-1.0,1.0,1.0,1.0,TATTACATACC,TATTACATACC.TATTACTTACC
+62677,CP003827.1,707630,8,CNAG_03346,bZip transcription factor  putative,-1.0,1.0,1.0,1.0,AGCAC,AGCAC.AGTAC
+62695,CP003827.1,707663,8,CNAG_03346,bZip transcription factor  putative,-1.0,1.0,1.0,1.0,GGTGGTGT,GGTGGTGT.GGTGATGT
+62843,CP003827.1,707947,8,CNAG_03346,bZip transcription factor  putative,-1.0,1.0,1.0,1.0,AAGGAGGC,AAGGAGGC.AAGCAGGC
+62931,CP003827.1,708198,8,CNAG_03346,bZip transcription factor  putative,-1.0,0.0,0.0,0.0,C,C.A
+62936,CP003827.1,708205,8,CNAG_03346,bZip transcription factor  putative,-1.0,0.0,0.0,0.0,G,G.T

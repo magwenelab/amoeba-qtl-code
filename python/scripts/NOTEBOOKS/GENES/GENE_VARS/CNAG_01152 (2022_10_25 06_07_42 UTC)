@@ -1,0 +1,6 @@
+,Seqid,Pos,Chrom,Gene,Description,Strand,PMY2649,PMY2650,Ref,Alt
+22437,CP003824.1,1066471,5,CNAG_01152,small subunit ribosomal protein S6e  small subunit ribosomal protein S6e  variant,1.0,1.0,1.0,CCATTCTT,CCATTCTT.CCACTCTT.ACACTCTT
+22580,CP003824.1,1066779,5,CNAG_01152,small subunit ribosomal protein S6e  small subunit ribosomal protein S6e  variant,1.0,1.0,1.0,GATTT,GATTT.GGTTT.TGTTT
+22593,CP003824.1,1066801,5,CNAG_01152,small subunit ribosomal protein S6e  small subunit ribosomal protein S6e  variant,1.0,1.0,1.0,T,T.G
+22652,CP003824.1,1066938,5,CNAG_01152,small subunit ribosomal protein S6e  small subunit ribosomal protein S6e  variant,1.0,1.0,1.0,CGCCGAGG,CGCCGAGG.CGCTGAGG
+22657,CP003824.1,1066963,5,CNAG_01152,small subunit ribosomal protein S6e  small subunit ribosomal protein S6e  variant,1.0,1.0,0.0,GCCGCC,GCCGCC.GCCGTC

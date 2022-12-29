@@ -1,0 +1,8 @@
+,Seqid,Pos,Chrom,Gene,Description,Strand,PMY2649,Ref,Alt
+4,CP003824.1,1015010,5,CNAG_01172,parallel beta-helix repeat protein,-1.0,1.0,AAGTC,AAGTC.AAGTT
+8,CP003824.1,1015035,5,CNAG_01172,parallel beta-helix repeat protein,-1.0,1.0,C,C.T
+57,CP003824.1,1015148,5,CNAG_01172,parallel beta-helix repeat protein,-1.0,1.0,TAACA,TAACA.TAGCA
+72,CP003824.1,1015178,5,CNAG_01172,parallel beta-helix repeat protein,-1.0,1.0,CGAGGAAC,CGAGGAAC.CGAAGAAC
+126,CP003824.1,1015276,5,CNAG_01172,parallel beta-helix repeat protein,-1.0,1.0,AGGAGAAGG,AGGAGAAGG.AGGAAAAGG
+135,CP003824.1,1015298,5,CNAG_01172,parallel beta-helix repeat protein,-1.0,0.0,A,A.C.G
+139,CP003824.1,1015304,5,CNAG_01172,parallel beta-helix repeat protein,-1.0,1.0,TGGTGGT,TGGTGGT.TGGTAGT

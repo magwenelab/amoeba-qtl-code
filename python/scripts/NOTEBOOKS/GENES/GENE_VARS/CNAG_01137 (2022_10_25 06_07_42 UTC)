@@ -1,0 +1,22 @@
+,Seqid,Pos,Chrom,Gene,Description,Strand,PMY2649,PMY2650,PMY2556,Ref,Alt
+39957,CP003824.1,1104744,5,CNAG_01137,aconitate hydratase  mitochondrial,1.0,1.0,1.0,1.0,CGAC,CGAC.CGAT
+40164,CP003824.1,1105206,5,CNAG_01137,aconitate hydratase  mitochondrial,1.0,1.0,1.0,1.0,ATGACAGC,ATGACAGC.ATGGCAGC
+40208,CP003824.1,1105324,5,CNAG_01137,aconitate hydratase  mitochondrial,1.0,1.0,1.0,1.0,GCGGGG,GCGGGG.GCGAGG
+40377,CP003824.1,1105683,5,CNAG_01137,aconitate hydratase  mitochondrial,1.0,1.0,0.0,0.0,T,T.A.C
+40675,CP003824.1,1106336,5,CNAG_01137,aconitate hydratase  mitochondrial,1.0,0.0,1.0,0.0,TGCC,TGCC.TGCT
+40758,CP003824.1,1106541,5,CNAG_01137,aconitate hydratase  mitochondrial,1.0,1.0,0.0,1.0,GTC,GTC.GTG
+40814,CP003824.1,1106656,5,CNAG_01137,aconitate hydratase  mitochondrial,1.0,0.0,1.0,0.0,TAA,TAA.TAT
+40825,CP003824.1,1106673,5,CNAG_01137,aconitate hydratase  mitochondrial,1.0,1.0,0.0,1.0,GGATTG,GGATTG.GGGTTG
+40858,CP003824.1,1106753,5,CNAG_01137,aconitate hydratase  mitochondrial,1.0,0.0,1.0,0.0,C,C.G
+40870,CP003824.1,1106780,5,CNAG_01137,aconitate hydratase  mitochondrial,1.0,1.0,0.0,1.0,CTCC,CTCC.CTCT
+40875,CP003824.1,1106794,5,CNAG_01137,aconitate hydratase  mitochondrial,1.0,0.0,1.0,0.0,TCACTG,TCACTG.TCACCG
+40896,CP003824.1,1106851,5,CNAG_01137,aconitate hydratase  mitochondrial,1.0,1.0,0.0,1.0,AG,AG.AA
+40933,CP003824.1,1106918,5,CNAG_01137,aconitate hydratase  mitochondrial,1.0,0.0,1.0,0.0,C,C.T
+40957,CP003824.1,1106978,5,CNAG_01137,aconitate hydratase  mitochondrial,1.0,1.0,1.0,1.0,CGTTAGCCCC,CGTTAGCCCC.CGTCAGCCCG.CGTCAGCCCT.GGTCAGCCCG
+41041,CP003824.1,1107184,5,CNAG_01137,aconitate hydratase  mitochondrial,1.0,1.0,0.0,1.0,CGTTG,CGTTG.CGTTT
+41044,CP003824.1,1107193,5,CNAG_01137,aconitate hydratase  mitochondrial,1.0,1.0,2.0,1.0,CGTTTTTATC,CGTTTTTATC.CGTTTTTTTTATC.CGTTTTTTTATC
+41074,CP003824.1,1107297,5,CNAG_01137,aconitate hydratase  mitochondrial,1.0,1.0,0.0,1.0,TAT,TAT.TAC
+41197,CP003824.1,1107577,5,CNAG_01137,aconitate hydratase  mitochondrial,1.0,1.0,1.0,1.0,AGCCGG,AGCCGG.AGCCCG
+41200,CP003824.1,1107591,5,CNAG_01137,aconitate hydratase  mitochondrial,1.0,0.0,1.0,0.0,ATC,ATC.ATT
+41260,CP003824.1,1107714,5,CNAG_01137,aconitate hydratase  mitochondrial,1.0,1.0,1.0,1.0,ATT,ATT.ATG
+41283,CP003824.1,1107753,5,CNAG_01137,aconitate hydratase  mitochondrial,1.0,1.0,1.0,1.0,TGGTG,TGGTG.TGGTT

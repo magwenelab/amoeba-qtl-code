@@ -1,0 +1,25 @@
+,Seqid,Pos,Chrom,Gene,Description,Strand,PMY2649,PMY2650,PMY2556,PMY2567,PMY2590,Ref,Alt
+83681,CP003827.1,753886,8,CNAG_03365,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,1.0,1.0,GCG,GCG.GCA
+83684,CP003827.1,753896,8,CNAG_03365,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,1.0,1.0,CAACA,CAACA.CATCA
+83751,CP003827.1,754023,8,CNAG_03365,hypothetical protein  hypothetical protein  variant,1.0,0.0,1.0,1.0,0.0,1.0,CACCG,CACCG.CAGCG
+83849,CP003827.1,754227,8,CNAG_03365,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,1.0,1.0,TATTA,TATTA.TACTA
+83927,CP003827.1,754373,8,CNAG_03365,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,1.0,1.0,CATCCAAAA,CATCCAAAA.CATCTAAAA
+83941,CP003827.1,754402,8,CNAG_03365,hypothetical protein  hypothetical protein  variant,1.0,0.0,1.0,1.0,0.0,1.0,GGATAT,GGATAT.GGACAT
+84079,CP003827.1,754678,8,CNAG_03365,hypothetical protein  hypothetical protein  variant,1.0,0.0,,1.0,0.0,1.0,AG,AG.AA
+84081,CP003827.1,754693,8,CNAG_03365,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,1.0,1.0,ATGT,ATGT.ATGC
+84122,CP003827.1,754809,8,CNAG_03365,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,1.0,1.0,CACC,CACC.CACG
+84126,CP003827.1,754821,8,CNAG_03365,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,1.0,1.0,TGACGCTG,TGACGCTG.TGACACTG
+84218,CP003827.1,755026,8,CNAG_03365,hypothetical protein  hypothetical protein  variant,1.0,0.0,1.0,1.0,0.0,1.0,G,G.A
+84244,CP003827.1,755091,8,CNAG_03365,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,1.0,1.0,ATTCC,ATTCC.ATTCT
+84270,CP003827.1,755145,8,CNAG_03365,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,1.0,1.0,AA,AA.AG
+84271,CP003827.1,755150,8,CNAG_03365,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,1.0,1.0,AGT,AGT.AGC
+84272,CP003827.1,755156,8,CNAG_03365,hypothetical protein  hypothetical protein  variant,1.0,1.0,0.0,0.0,1.0,0.0,GG,GG.GA
+84281,CP003827.1,755177,8,CNAG_03365,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,1.0,1.0,CCCATTGC,CCCATTGC.CCCAATGC
+84318,CP003827.1,755242,8,CNAG_03365,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,1.0,1.0,TCA,TCA.TTA
+84320,CP003827.1,755249,8,CNAG_03365,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,1.0,1.0,TTGG,TTGG.CTGG
+84333,CP003827.1,755277,8,CNAG_03365,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,1.0,1.0,AACTCCCC,AACTCCCC.AACGGCCCT
+84337,CP003827.1,755301,8,CNAG_03365,hypothetical protein  hypothetical protein  variant,1.0,1.0,0.0,0.0,1.0,0.0,ATC,ATC.ATT
+84347,CP003827.1,755333,8,CNAG_03365,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,1.0,1.0,TCATC,TCATC.GCATC
+84350,CP003827.1,755344,8,CNAG_03365,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,1.0,1.0,G,G.A
+84360,CP003827.1,755377,8,CNAG_03365,hypothetical protein  hypothetical protein  variant,1.0,1.0,0.0,1.0,0.0,0.0,TAGAGC,TAGAGC.GAGAAC
+84379,CP003827.1,755432,8,CNAG_03365,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,1.0,1.0,ATGAA,ATGAA.ATGAG

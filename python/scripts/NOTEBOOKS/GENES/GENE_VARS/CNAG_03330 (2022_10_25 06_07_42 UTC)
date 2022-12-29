@@ -1,0 +1,12 @@
+,Seqid,Pos,Chrom,Gene,Description,Strand,PMY2649,PMY2650,PMY2556,Ref,Alt
+43532,CP003827.1,664949,8,CNAG_03330,RecQ-mediated genome instability protein 1,-1.0,0.0,0.0,0.0,T,T.A.C
+43599,CP003827.1,665091,8,CNAG_03330,RecQ-mediated genome instability protein 1,-1.0,1.0,1.0,1.0,TATGGCAT,TATGGCAT.TATGACAT
+43674,CP003827.1,665273,8,CNAG_03330,RecQ-mediated genome instability protein 1,-1.0,0.0,0.0,0.0,TTGCCA,TTGCCA.CCGCCG.GTGCCA
+43744,CP003827.1,665428,8,CNAG_03330,RecQ-mediated genome instability protein 1,-1.0,1.0,1.0,1.0,CGAA,CGAA.CCAA
+43793,CP003827.1,665558,8,CNAG_03330,RecQ-mediated genome instability protein 1,-1.0,1.0,1.0,1.0,CAACAGC,CAACAGC.CAACGGC
+43825,CP003827.1,665620,8,CNAG_03330,RecQ-mediated genome instability protein 1,-1.0,1.0,1.0,1.0,GAG,GAG.AAG
+43861,CP003827.1,665706,8,CNAG_03330,RecQ-mediated genome instability protein 1,-1.0,0.0,,1.0,GCGT,GCGT.GCGC
+44067,CP003827.1,666138,8,CNAG_03330,RecQ-mediated genome instability protein 1,-1.0,1.0,0.0,0.0,CGGCACTTT,CGGCACTTT.CGGCGCTTT
+44161,CP003827.1,666321,8,CNAG_03330,RecQ-mediated genome instability protein 1,-1.0,1.0,1.0,1.0,TAGTCCT,TAGTCCT.TAGTTCT
+44204,CP003827.1,666416,8,CNAG_03330,RecQ-mediated genome instability protein 1,-1.0,1.0,1.0,1.0,GCCAATGC,GCCAATGC.GCCAGTGC
+44327,CP003827.1,666658,8,CNAG_03330,RecQ-mediated genome instability protein 1,-1.0,1.0,1.0,1.0,CTTCTCCCCCCC,CTTCTCCCCCCC.CTTCTCCTCCCC

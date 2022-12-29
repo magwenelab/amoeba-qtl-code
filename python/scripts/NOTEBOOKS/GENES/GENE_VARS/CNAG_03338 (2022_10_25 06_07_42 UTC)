@@ -1,0 +1,20 @@
+,Seqid,Pos,Chrom,Gene,Description,Strand,PMY2649,PMY2650,PMY2565,Ref,Alt
+51795,CP003827.1,683243,8,CNAG_03338,hypothetical protein  hypothetical protein  variant,1.0,1.0,0.0,1.0,TATCA,TATCA.TATCT
+51871,CP003827.1,683419,8,CNAG_03338,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,GTA,GTA.GTG
+51899,CP003827.1,683494,8,CNAG_03338,hypothetical protein  hypothetical protein  variant,1.0,2.0,1.0,1.0,AGAGAAC,AGAGAAC.AGAGGAC.GGAGGAC
+51925,CP003827.1,683541,8,CNAG_03338,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,AGTGCGAA,AGTGCGAA.AGTGAGAA
+52047,CP003827.1,683796,8,CNAG_03338,hypothetical protein  hypothetical protein  variant,1.0,1.0,2.0,1.0,GACAGTTCCCT,GACAGTTCCCT.GACAGTTTCCT.AACAGTTTCCT
+52065,CP003827.1,683857,8,CNAG_03338,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,T,T.C
+52260,CP003827.1,684231,8,CNAG_03338,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,ATCAATT,ATCAATT.ATTAATT.CTTCATT
+52278,CP003827.1,684267,8,CNAG_03338,hypothetical protein  hypothetical protein  variant,1.0,0.0,1.0,0.0,CAGG,CAGG.CAAG
+52291,CP003827.1,684296,8,CNAG_03338,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,CTCGGA,CTCGGA.CTCAGA
+52311,CP003827.1,684342,8,CNAG_03338,hypothetical protein  hypothetical protein  variant,1.0,0.0,0.0,0.0,T,T.G
+52313,CP003827.1,684345,8,CNAG_03338,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,TTG,TTG.TTA
+52320,CP003827.1,684367,8,CNAG_03338,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,AAGA,AAGA.AAGG
+52331,CP003827.1,684394,8,CNAG_03338,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,TAGG,TAGG.TAAG
+52343,CP003827.1,684435,8,CNAG_03338,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,TGCTCT,TGCTCT.TGCCTCT
+52355,CP003827.1,684464,8,CNAG_03338,hypothetical protein  hypothetical protein  variant,1.0,1.0,2.0,1.0,TATA,TATA.TATT.TATC
+52370,CP003827.1,684509,8,CNAG_03338,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,GT,GT.AT
+52371,CP003827.1,684514,8,CNAG_03338,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,TCAGCCC,TCAGCCC.TCAACCC
+52374,CP003827.1,684531,8,CNAG_03338,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,T,T.C
+52377,CP003827.1,684541,8,CNAG_03338,hypothetical protein  hypothetical protein  variant,1.0,1.0,1.0,1.0,TCTC,TCTC.TCAC

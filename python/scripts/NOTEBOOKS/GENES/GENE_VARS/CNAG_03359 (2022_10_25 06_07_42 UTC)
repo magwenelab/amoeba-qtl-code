@@ -1,0 +1,6 @@
+,Seqid,Pos,Chrom,Gene,Description,Strand,PMY2649,PMY2650,PMY2565,Ref,Alt
+79349,CP003827.1,744250,8,CNAG_03359,cytochrome c oxidase subunit 7,1.0,1.0,0.0,0.0,A,A.C
+79494,CP003827.1,744567,8,CNAG_03359,cytochrome c oxidase subunit 7,1.0,1.0,1.0,1.0,ATCGAA,ATCGAA.ACCGAA
+79554,CP003827.1,744697,8,CNAG_03359,cytochrome c oxidase subunit 7,1.0,0.0,1.0,0.0,AG,AG.AA
+79561,CP003827.1,744714,8,CNAG_03359,cytochrome c oxidase subunit 7,1.0,1.0,1.0,1.0,GAAATAG,GAAATAG.GAATTAG
+79580,CP003827.1,744760,8,CNAG_03359,cytochrome c oxidase subunit 7,1.0,1.0,2.0,1.0,GCTTTG,GCTTTG.ACTTTT.GCTTTT

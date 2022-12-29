@@ -1,0 +1,14 @@
+,Seqid,Pos,Chrom,Gene,Description,Strand,PMY2649,PMY2650,Ref,Alt
+48501,CP003827.1,676061,8,CNAG_03335,Ribose-phosphate pyrophosphokinase,1.0,1.0,1.0,TACTAGA,TACTAGA.TACCAGA
+48518,CP003827.1,676100,8,CNAG_03335,Ribose-phosphate pyrophosphokinase,1.0,1.0,1.0,GCAACGCT,GCAACGCT.GCAGCGCT
+48525,CP003827.1,676131,8,CNAG_03335,Ribose-phosphate pyrophosphokinase,1.0,1.0,0.0,TTTG,TTTG.TCTG
+48543,CP003827.1,676186,8,CNAG_03335,Ribose-phosphate pyrophosphokinase,1.0,1.0,1.0,TCTTTTGGC,TCTTTTGGC.TCTTGGC.GCTTGGC
+48663,CP003827.1,676449,8,CNAG_03335,Ribose-phosphate pyrophosphokinase,1.0,1.0,0.0,GAAA,GAAA.GACG
+48692,CP003827.1,676511,8,CNAG_03335,Ribose-phosphate pyrophosphokinase,1.0,1.0,1.0,TAGTCCG,TAGTCCG.TAGCCCG
+48712,CP003827.1,676574,8,CNAG_03335,Ribose-phosphate pyrophosphokinase,1.0,0.0,1.0,TTGCG,TTGCG.TTGCT
+48798,CP003827.1,676741,8,CNAG_03335,Ribose-phosphate pyrophosphokinase,1.0,0.0,1.0,GTT,GTT.GTA
+48829,CP003827.1,676802,8,CNAG_03335,Ribose-phosphate pyrophosphokinase,1.0,1.0,0.0,CAAGG,CAAGG.CAAAG
+49015,CP003827.1,677200,8,CNAG_03335,Ribose-phosphate pyrophosphokinase,1.0,1.0,0.0,TCA,TCA.TCG
+49036,CP003827.1,677242,8,CNAG_03335,Ribose-phosphate pyrophosphokinase,1.0,1.0,0.0,TGCC,TGCC.TGCT
+49249,CP003827.1,677702,8,CNAG_03335,Ribose-phosphate pyrophosphokinase,1.0,0.0,1.0,CGAG,CGAG.CGAA
+49262,CP003827.1,677729,8,CNAG_03335,Ribose-phosphate pyrophosphokinase,1.0,1.0,0.0,CC,CC.TC

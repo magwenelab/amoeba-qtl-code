@@ -1,0 +1,21 @@
+,Seqid,Pos,Chrom,Gene,Description,Strand,PMY2649,PMY2650,PMY2556,Ref,Alt
+63814,CP003827.1,711073,8,CNAG_03347,ATP-dependent Clp protease ATP-binding subunit ClpB,-1.0,0.0,0.0,0.0,A,A.G
+63829,CP003827.1,711100,8,CNAG_03347,ATP-dependent Clp protease ATP-binding subunit ClpB,-1.0,1.0,0.0,0.0,CTC,CTC.CTT
+63903,CP003827.1,711262,8,CNAG_03347,ATP-dependent Clp protease ATP-binding subunit ClpB,-1.0,0.0,1.0,1.0,T,T.C
+63922,CP003827.1,711307,8,CNAG_03347,ATP-dependent Clp protease ATP-binding subunit ClpB,-1.0,1.0,1.0,1.0,TAG,TAG.TAT
+63972,CP003827.1,711421,8,CNAG_03347,ATP-dependent Clp protease ATP-binding subunit ClpB,-1.0,1.0,1.0,1.0,TTA,TTA.TCA
+64052,CP003827.1,711582,8,CNAG_03347,ATP-dependent Clp protease ATP-binding subunit ClpB,-1.0,1.0,1.0,1.0,GGCGGAA,GGCGGAA.GGTGGAA
+64065,CP003827.1,711606,8,CNAG_03347,ATP-dependent Clp protease ATP-binding subunit ClpB,-1.0,1.0,1.0,1.0,AGCT,AGCT.AGTT
+64068,CP003827.1,711626,8,CNAG_03347,ATP-dependent Clp protease ATP-binding subunit ClpB,-1.0,1.0,1.0,1.0,GAGCT,GAGCT.AAGCT
+64152,CP003827.1,711801,8,CNAG_03347,ATP-dependent Clp protease ATP-binding subunit ClpB,-1.0,1.0,1.0,1.0,AG,AG.AA
+64181,CP003827.1,711867,8,CNAG_03347,ATP-dependent Clp protease ATP-binding subunit ClpB,-1.0,1.0,1.0,1.0,TCGAATA,TCGAATA.TCAAATA
+64248,CP003827.1,712008,8,CNAG_03347,ATP-dependent Clp protease ATP-binding subunit ClpB,-1.0,1.0,1.0,1.0,ATC,ATC.ATT
+64572,CP003827.1,712703,8,CNAG_03347,ATP-dependent Clp protease ATP-binding subunit ClpB,-1.0,1.0,1.0,1.0,TAACTGAAA,TAACTGAAA.TAACAGAAA
+64581,CP003827.1,712730,8,CNAG_03347,ATP-dependent Clp protease ATP-binding subunit ClpB,-1.0,0.0,1.0,0.0,T,T.C
+64583,CP003827.1,712733,8,CNAG_03347,ATP-dependent Clp protease ATP-binding subunit ClpB,-1.0,0.0,0.0,0.0,G,G.T
+64592,CP003827.1,712750,8,CNAG_03347,ATP-dependent Clp protease ATP-binding subunit ClpB,-1.0,0.0,0.0,0.0,T,T.A.C
+64613,CP003827.1,712796,8,CNAG_03347,ATP-dependent Clp protease ATP-binding subunit ClpB,-1.0,0.0,0.0,0.0,G,G.A.T
+64621,CP003827.1,712821,8,CNAG_03347,ATP-dependent Clp protease ATP-binding subunit ClpB,-1.0,0.0,2.0,0.0,A,A.C.G
+64623,CP003827.1,712824,8,CNAG_03347,ATP-dependent Clp protease ATP-binding subunit ClpB,-1.0,0.0,0.0,0.0,T,T.G
+64650,CP003827.1,712904,8,CNAG_03347,ATP-dependent Clp protease ATP-binding subunit ClpB,-1.0,0.0,0.0,0.0,T,T.G
+65052,CP003827.1,713762,8,CNAG_03347,ATP-dependent Clp protease ATP-binding subunit ClpB,-1.0,1.0,1.0,1.0,AGATAGA,AGATAGA.AGACAGA.TGACAGT

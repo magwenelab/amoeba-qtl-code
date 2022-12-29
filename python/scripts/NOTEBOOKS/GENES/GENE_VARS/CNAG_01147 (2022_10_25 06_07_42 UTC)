@@ -1,0 +1,4 @@
+,Seqid,Pos,Chrom,Gene,Description,Strand,PMY2649,Ref,Alt
+28360,CP003824.1,1079562,5,CNAG_01147,arp2/3 complex 20 kDa subunit,1.0,1.0,TC,TC.GC
+28366,CP003824.1,1079577,5,CNAG_01147,arp2/3 complex 20 kDa subunit,1.0,1.0,A,A.G
+28553,CP003824.1,1080008,5,CNAG_01147,arp2/3 complex 20 kDa subunit,1.0,1.0,CCAC,CCAC.CCAT

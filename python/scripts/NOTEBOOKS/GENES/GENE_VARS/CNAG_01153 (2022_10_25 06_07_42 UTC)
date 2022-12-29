@@ -1,0 +1,7 @@
+,Seqid,Pos,Chrom,Gene,Description,Strand,PMY2649,Ref,Alt
+21751,CP003824.1,1064961,5,CNAG_01153,small subunit ribosomal protein S13e,-1.0,1.0,TGTAT,TGTAT.CGTAT
+21798,CP003824.1,1065046,5,CNAG_01153,small subunit ribosomal protein S13e,-1.0,1.0,ACCCGTAC,ACCCGTAC.ACCAGTAC
+21873,CP003824.1,1065189,5,CNAG_01153,small subunit ribosomal protein S13e,-1.0,1.0,AGCA,AGCA.GGCA
+21901,CP003824.1,1065257,5,CNAG_01153,small subunit ribosomal protein S13e,-1.0,1.0,G,G.A
+21975,CP003824.1,1065438,5,CNAG_01153,small subunit ribosomal protein S13e,-1.0,1.0,ACTCG,ACTCG.ACTCC
+22011,CP003824.1,1065554,5,CNAG_01153,small subunit ribosomal protein S13e,-1.0,1.0,GA,GA.GG
