@@ -1,0 +1,25 @@
+Gene,Chrom,Start,End,Nvars,Nonsyn,Description,Strand
+CNAG_03342,8,692706,694766,5,3,tRNA (guanine-N(7)-)-methyltransferase subunit TRM82,1
+CNAG_03343,8,694724,696026,3,1,hypothetical protein,-1
+CNAG_03344,8,696160,698711,1,1,hypothetical protein,1
+CNAG_03345,8,696583,704402,4,0,putative translational repressor,-1
+CNAG_03346,8,706174,708222,0,0,bZip transcription factor,-1
+CNAG_03347,8,711064,713892,1,1,ATP-dependent Clp protease ATP-binding subunit ClpB,-1
+CNAG_03348,8,714123,717304,4,0,hypothetical protein,-1
+CNAG_03349,8,718250,721408,3,0,pre-mRNA-processing factor 17,-1
+CNAG_03352,8,725534,726325,1,0,hypothetical protein,-1
+CNAG_03353,8,726483,727780,4,1,hypothetical protein,1
+CNAG_03354,8,728019,729581,1,0,hypothetical protein,1
+CNAG_03355,8,730288,738294,6,1,Two-component-like sensor kinase,1
+CNAG_03356,8,738180,739704,1,0,hypothetical protein,-1
+CNAG_03357,8,739822,742000,1,0,hypothetical protein,-1
+CNAG_03358,8,742046,744593,1,0,Phosphoglycerate kinase,-1
+CNAG_03359,8,744190,744760,1,0,cytochrome c oxidase subunit 7,1
+CNAG_03360,8,745015,746904,4,2,hypothetical protein,1
+CNAG_03361,8,747006,748905,6,3,hypothetical protein,1
+CNAG_03362,8,748837,750946,5,2,hypothetical protein,-1
+CNAG_03363,8,751532,752682,2,1,hypothetical protein,1
+CNAG_03364,8,752630,753674,2,1,hypothetical protein,-1
+CNAG_03365,8,753864,755453,3,2,hypothetical protein,1
+CNAG_03366,8,755992,763369,10,2,C2H2 type zinc finger transcription factor,1
+CNAG_07724,8,721568,725406,5,2,Metal-binding regulatory protein CUF1,-1

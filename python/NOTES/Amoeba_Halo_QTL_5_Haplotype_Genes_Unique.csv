@@ -1,0 +1,34 @@
+Gene,Chrom,Start,End,Nvars,Nonsyn,Description,Strand
+CNAG_01138,5,1101942,1103697,0,0,cytochrome c peroxidase,1
+CNAG_01141,5,1094404,1095636,1,0,exosome complex component RRP40,-1
+CNAG_01142,5,1090087,1094300,1,0,endoplasmic reticulum protein,-1
+CNAG_01143,5,1088703,1090189,0,0,hypothetical protein,1
+CNAG_01144,5,1086069,1088546,0,0,replication factor A1,-1
+CNAG_01145,5,1084554,1086102,1,1,hypothetical protein,1
+CNAG_01146,5,1080205,1084412,1,1,U3 small nucleolar RNA-associated protein 22,-1
+CNAG_01147,5,1079446,1080597,0,0,arp2/3 complex 20 kDa subunit,1
+CNAG_01148,5,1077307,1079287,1,0,FK506-binding protein 4,-1
+CNAG_01149,5,1071703,1077079,1,1,hypothetical protein,-1
+CNAG_01150,5,1068784,1071449,0,0,omega-6 fatty acid desaturase (delta-12 desaturase),1
+CNAG_01151,5,1067288,1068577,2,0,ubiquitin-conjugating enzyme E2 D/E,-1
+CNAG_01152,5,1066045,1067173,1,1,small subunit ribosomal protein S6e,1
+CNAG_01153,5,1064824,1065837,0,0,small subunit ribosomal protein S13e,-1
+CNAG_01154,5,1060415,1062123,0,0,hypothetical protein,-1
+CNAG_01155,5,1057646,1060504,2,0,glycerol kinase,1
+CNAG_01156,5,1054611,1057342,0,0,capsular related protein,-1
+CNAG_01157,5,1052187,1054534,1,0,hypothetical protein,-1
+CNAG_01158,5,1049247,1051625,2,1,branchpoint-bridging protein,1
+CNAG_01159,5,1046983,1049114,0,0,pre-mRNA-splicing factor slu7,-1
+CNAG_01161,5,1041687,1043338,0,0,hypothetical protein,1
+CNAG_01162,5,1039748,1041583,2,0,hypothetical protein,-1
+CNAG_01163,5,1033941,1037151,2,2,DNA repair and recombination protein RAD54-like protein,1
+CNAG_01164,5,1029583,1033747,1,0,glutamine-fructose-6-phosphate transaminase (isomerizing),-1
+CNAG_01165,5,1027395,1030070,0,0,D-erythro-sphingosine kinase,1
+CNAG_01166,5,1026129,1027326,1,1,urease accessory protein,-1
+CNAG_01167,5,1021451,1026174,3,2,chromosome associated protein,1
+CNAG_01168,5,1019136,1021259,2,0,H/ACA ribonucleoprotein complex subunit 4,-1
+CNAG_01169,5,1017565,1019512,7,1,Aspartyl aminopeptidase,1
+CNAG_01170,5,1016102,1017337,7,0,small subunit ribosomal protein S17,-1
+CNAG_01171,5,1015508,1016189,1,0,hypothetical protein,1
+CNAG_01172,5,1012602,1015359,0,0,parallel beta-helix repeat protein,-1
+CNAG_07439,5,1043550,1047115,0,0,U3 small nucleolar RNA-associated protein 21,1

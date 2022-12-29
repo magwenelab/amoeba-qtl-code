@@ -1,0 +1,46 @@
+,Gene,Nonsyndif,Parent,Start,End,Description
+0,CNAG_03325,1.0,CNAG_03325-t26_1,651584,654822,ChAPs family protein
+1,CNAG_03326,1.0,CNAG_03326-t26_1,655318,659025,Chitin synthase
+2,CNAG_03329,0.0,CNAG_03329-t26_1,662898,664806,PHD-finger protein
+3,CNAG_03330,1.0,CNAG_03330-t26_1,664883,666765,RecQ-mediated genome instability protein 1
+4,CNAG_03331,0.0,CNAG_03331-t26_1,666806,668864,Phosphatidylserine decarboxylase
+5,CNAG_03332,0.0,CNAG_03332-t26_1,668750,670216,replication factor C subunit 2/4
+6,CNAG_03333,0.0,CNAG_03333-t26_1,670560,673656,cytoplasmic protein
+7,CNAG_03339,1.0,CNAG_03339-t26_2,684296,687151,biotin transporter
+8,CNAG_03340,3.0,CNAG_03340-t26_1,687604,689319,flavonol synthase
+9,CNAG_03341,2.0,CNAG_03341-t26_1,689348,692557,minichromosome maintenance protein 2
+10,CNAG_03342,2.0,CNAG_03342-t26_1,692706,694766,tRNA (guanine-N(7)-)-methyltransferase subunit TRM82
+11,CNAG_03345,0.0,CNAG_03345-t26_2,696583,704402,putative translational repressor
+12,CNAG_03346,0.0,CNAG_03346-t26_1,706174,708222,bZip transcription factor
+13,CNAG_03347,1.0,CNAG_03347-t26_1,711064,713892,ATP-dependent Clp protease ATP-binding subunit ClpB
+14,CNAG_03349,0.0,CNAG_03349-t26_1,718250,721408,pre-mRNA-processing factor 17
+15,CNAG_03355,0.0,CNAG_03355-t26_1,730288,738294,Two-component-like sensor kinase
+16,CNAG_03358,0.0,CNAG_03358-t26_1,742046,744593,Phosphoglycerate kinase
+17,CNAG_03359,0.0,CNAG_03359-t26_1,744190,744760,cytochrome c oxidase subunit 7
+18,CNAG_03366,1.0,CNAG_03366-t26_2,755992,763369,C2H2 type zinc finger transcription factor
+19,CNAG_03367,1.0,CNAG_03367-t26_1,763309,765904,Uridine kinase
+20,CNAG_03368,5.0,CNAG_03368-t26_2,766081,774784,microtubule Associated protein
+21,CNAG_03369,2.0,CNAG_03369-t26_1,776302,780325,WEE protein kinase
+22,CNAG_03370,0.0,CNAG_03370-t26_1,776577,781618,calcium-binding protein NCS-1
+23,CNAG_03372,0.0,CNAG_03372-t26_1,784755,788129,vacuolar protein-sorting protein bro1
+24,CNAG_03374,0.0,CNAG_03374-t26_1,788910,789792,DNA replication complex GINS protein PSF1
+25,CNAG_03375,0.0,CNAG_03375-t26_1,789801,791500,Succinyl-CoA synthetase alpha subunit
+26,CNAG_03376,0.0,CNAG_03376-t26_2,791460,795098,cytoplasmic protein
+27,CNAG_03378,0.0,CNAG_03378-t26_1,796408,799406,DNA binding protein
+28,CNAG_03379,0.0,CNAG_03379-t26_1,799277,800906,N-acetyltransferase 5
+29,CNAG_03385,0.0,CNAG_03385-t26_1,813284,815329,g1/s-specific cyclin pcl1
+30,CNAG_03386,0.0,CNAG_03386-t26_1,815431,817304,solute carrier family 25 (mitochondrial carnitine/acylcarnitine transporter)
+31,CNAG_03388,1.0,CNAG_03388-t26_1,820127,823691,nuclear protein
+32,CNAG_03389,1.0,CNAG_03389-t26_1,824976,827276,alpha-ketoglutarate catabolism dioxygenase
+33,CNAG_03390,0.0,CNAG_03390-t26_1,827771,830797,AAA family ATPase
+34,CNAG_03391,0.0,CNAG_03391-t26_1,830734,832424,mitochondrial inner membrane protein
+35,CNAG_03392,1.0,CNAG_03392-t26_1,832538,837616,DNA supercoiling protein
+36,CNAG_03393,0.0,CNAG_03393-t26_1,836770,838322,acyl-CoA thioesterase II
+37,CNAG_03395,0.0,CNAG_03395-t26_1,840483,841794,NifU-like protein c
+38,CNAG_03396,1.0,CNAG_03396-t26_1,842050,844275,NAD diphosphatase
+39,CNAG_03398,0.0,CNAG_03398-t26_1,848209,850086,solute carrier family 39 (zinc transporter)
+40,CNAG_03399,1.0,CNAG_03399-t26_1,848021,854981,SIT4-associating protein/190
+41,CNAG_03400,0.0,CNAG_03400-t26_1,855293,857253,oxidoreductase
+42,CNAG_07724,1.0,CNAG_07724-t26_1,721568,725406,Metal-binding regulatory protein CUF1
+43,CNAG_07725,1.0,CNAG_07725-t26_2,781856,784029,HMG box factor
+44,CNAG_07728,0.0,CNAG_07728-t26_1,847527,848074,solute carrier family 39 (zinc transporter)

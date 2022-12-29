@@ -1,0 +1,11 @@
+,Gene,Nonsyndif,Parent,Start,End,Description
+0,CNAG_03342,2.0,CNAG_03342-t26_1,692706,694766,tRNA (guanine-N(7)-)-methyltransferase subunit TRM82
+1,CNAG_03345,0.0,CNAG_03345-t26_2,696583,704402,putative translational repressor
+2,CNAG_03346,0.0,CNAG_03346-t26_1,706174,708222,bZip transcription factor
+3,CNAG_03347,1.0,CNAG_03347-t26_1,711064,713892,ATP-dependent Clp protease ATP-binding subunit ClpB
+4,CNAG_03349,0.0,CNAG_03349-t26_1,718250,721408,pre-mRNA-processing factor 17
+5,CNAG_03355,0.0,CNAG_03355-t26_1,730288,738294,Two-component-like sensor kinase
+6,CNAG_03358,0.0,CNAG_03358-t26_1,742046,744593,Phosphoglycerate kinase
+7,CNAG_03359,0.0,CNAG_03359-t26_1,744190,744760,cytochrome c oxidase subunit 7
+8,CNAG_03366,1.0,CNAG_03366-t26_2,755992,763369,C2H2 type zinc finger transcription factor
+9,CNAG_07724,1.0,CNAG_07724-t26_1,721568,725406,Metal-binding regulatory protein CUF1

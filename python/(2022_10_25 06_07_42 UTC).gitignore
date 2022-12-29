@@ -1,0 +1,35 @@
+## ignore ipynb checkpoints and cached files
+*.ipynb_checkpoints
+*_pycache_*
+
+## VCF and reference files
+**.vcf.gz
+**.fasta
+**.gff*
+
+## csv files from VCF
+**CP0038*.csv.gz
+
+## Disagnostic figures
+**_depthplot.png
+
+## Ignore the gene files
+/GENOTYPE/GENES/*/**
+
+## Ignore figures
+/FIGURES/*.png
+/FIGURES/*.pdf
+/FIGURES/Progeny/*.png
+
+## Ignore haplotype analysis
+/SCRIPTS/NOTEBOOKS/FILES/*
+
+## Ignore files with "old" in them
+**_old.ipynb
+**_test.ipynb
+
+/SCRIPTS/NOTEBOOKS/OLD/*
+/SCRIPTS/NOTEBOOKS/TEST/*
+
+## Ignore power point files
+**.pptx 

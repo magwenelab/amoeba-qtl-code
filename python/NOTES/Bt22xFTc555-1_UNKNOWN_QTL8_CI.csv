@@ -1,0 +1,21 @@
+Seqid,Source,Type,Start,End,Score,Strand,Phase,Attributes,Gene,Parent,Description,Chrom
+CP003827.1,EuPathDB,gene,752630,753674,.,-,.,ID=CNAG_03364;description=hypothetical protein,CNAG_03364,CNAG_03364,hypothetical protein,8
+CP003827.1,EuPathDB,gene,710226,710331,.,+,.,ID=CNAG_10098;description=unspecified product,CNAG_10098,CNAG_10098,unspecified product,8
+CP003827.1,EuPathDB,gene,755315,755897,.,-,.,ID=CNAG_12759;description=unspecified product,CNAG_12759,CNAG_12759,unspecified product,8
+CP003827.1,EuPathDB,gene,748837,750946,.,-,.,ID=CNAG_03362;description=hypothetical protein,CNAG_03362,CNAG_03362,hypothetical protein,8
+CP003827.1,EuPathDB,gene,704260,705004,.,+,.,ID=CNAG_07723;description=hypothetical protein,CNAG_07723,CNAG_07723,hypothetical protein,8
+CP003827.1,EuPathDB,gene,745015,746904,.,+,.,ID=CNAG_03360;description=hypothetical protein,CNAG_03360,CNAG_03360,hypothetical protein,8
+CP003827.1,EuPathDB,gene,738180,739704,.,-,.,ID=CNAG_03356;description=hypothetical protein,CNAG_03356,CNAG_03356,hypothetical protein,8
+CP003827.1,EuPathDB,gene,726483,727780,.,+,.,ID=CNAG_03353;description=hypothetical protein,CNAG_03353,CNAG_03353,hypothetical protein,8
+CP003827.1,EuPathDB,gene,708661,709237,.,+,.,ID=CNAG_12756;description=unspecified product,CNAG_12756,CNAG_12756,unspecified product,8
+CP003827.1,EuPathDB,gene,729080,729998,.,-,.,ID=CNAG_12758;description=unspecified product,CNAG_12758,CNAG_12758,unspecified product,8
+CP003827.1,EuPathDB,gene,694724,696026,.,-,.,ID=CNAG_03343;description=hypothetical protein,CNAG_03343,CNAG_03343,hypothetical protein,8
+CP003827.1,EuPathDB,gene,753864,755453,.,+,.,ID=CNAG_03365;description=hypothetical protein%2C hypothetical protein%2C variant,CNAG_03365,CNAG_03365,hypothetical protein,8
+CP003827.1,EuPathDB,gene,714123,717304,.,-,.,ID=CNAG_03348;description=hypothetical protein,CNAG_03348,CNAG_03348,hypothetical protein,8
+CP003827.1,EuPathDB,gene,728019,729581,.,+,.,ID=CNAG_03354;description=hypothetical protein,CNAG_03354,CNAG_03354,hypothetical protein,8
+CP003827.1,EuPathDB,gene,747006,748905,.,+,.,ID=CNAG_03361;description=hypothetical protein,CNAG_03361,CNAG_03361,hypothetical protein,8
+CP003827.1,EuPathDB,gene,751532,752682,.,+,.,ID=CNAG_03363;description=hypothetical protein,CNAG_03363,CNAG_03363,hypothetical protein,8
+CP003827.1,EuPathDB,gene,696160,698711,.,+,.,ID=CNAG_03344;description=hypothetical protein,CNAG_03344,CNAG_03344,hypothetical protein,8
+CP003827.1,EuPathDB,gene,725534,726325,.,-,.,ID=CNAG_03352;description=hypothetical protein,CNAG_03352,CNAG_03352,hypothetical protein,8
+CP003827.1,EuPathDB,gene,739822,742000,.,-,.,ID=CNAG_03357;description=hypothetical protein,CNAG_03357,CNAG_03357,hypothetical protein,8
+CP003827.1,EuPathDB,gene,709277,709569,.,-,.,ID=CNAG_12757;description=unspecified product,CNAG_12757,CNAG_12757,unspecified product,8
